@@ -7,12 +7,13 @@ import helmet from "helmet";
 import compression from "compression"
 
 
-dotenv.config();
 
+dotenv.config();
 const app =express();
 const Port=process.env.PORT;
 const Mongo_URL=process.env.MONGO_URL as string;
 
+app.use(express.json());
 
 /*const limiter=rateLimit({
      windowMs:15 * 60 * 1000, //  15 minutes
