@@ -8,7 +8,10 @@ const userService= new UserService();
 const userControler= new UserControler(userService)
 
 
-router.get("/user",userControler.testUser)
+router.post("/sendCode",(req,res)=>userControler.sendCode(req,res))
+router.post("/verfyCode",(req,res)=>userControler.verfyCode(req,res))
+router.post("/register",(req,res)=>userControler.register(req,res))
+router.post("/login",(req,res)=>userControler.login(req,res))
 
 
 
