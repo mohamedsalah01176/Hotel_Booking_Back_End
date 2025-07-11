@@ -20,11 +20,15 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
-    "mongoose": "^8.16.2"
+    "mongoose": "^8.16.2",
+    "twilio": "^5.7.3",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.3",
+    "@types/yup": "^0.29.14",
     "dotenv": "^17.1.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
