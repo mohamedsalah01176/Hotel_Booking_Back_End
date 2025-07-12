@@ -1,12 +1,10 @@
 {
   "name": "back-end",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./dist/main.js",
-    "dev": "nodemon ./src/main.ts",
-    "build": "tsc -p ./"
+    "dev": "nodemon ./src/main.ts"
   },
   "author": "",
   "license": "ISC",
