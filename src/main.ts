@@ -45,6 +45,9 @@ app.use(compression());
 
 app.use("/api",userRouter)
 
+app.get('/', (_req, res) => {
+  res.send('API is working 🎉');
+});
 
 app.use((req:Request,res:Response)=>{
   if(req.originalUrl.startsWith('/api')){
