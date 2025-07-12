@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./dist/main.js",
-    "dev": "nodemon ./src/main.ts"
+    "start": "nodemon ./dist/main.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +19,7 @@
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.2",
     "twilio": "^5.7.3",
+    "nodemon": "^3.1.10",
     "yup": "^1.6.1"
   },
   "devDependencies": {
@@ -28,7 +28,6 @@
     "@types/express": "^5.0.3",
     "@types/yup": "^0.29.14",
     "dotenv": "^17.1.0",
-    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
