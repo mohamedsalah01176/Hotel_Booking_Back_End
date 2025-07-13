@@ -1,19 +1,13 @@
 import { ILoginUser, IUserBody } from "../interface/user";
-import * as yup from "yup"
 import bcrypt from "bcrypt"
 import UserModel from "../model/user";
 import { sendMessage } from "../util/sendMessage";
-import  twilio  from "twilio";
+import { forgetPasswordBodySchema, loginBodySchema, regiterBodySchema } from "../util/yapSchema";
+import { sendEmail } from "../util/sendEmail";
+import jwt from "jsonwebtoken";
 
 
-const bodySchema=yup.object({
-  name:yup.string().min(3,'Password must be at least 3 characters').required('Password is required'),
-  phone: yup.string().required('Password is required'),
-  email: yup.string().email().required('Password is required'),
-  password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number'),
-  role: yup.string().oneOf(['user', 'host', 'manager']),
-  birthDate: yup.date().optional()
-})
+
 
 let otpStore:{[key:string]:string}={};
 
@@ -77,10 +71,10 @@ export default class UserService{
 
   async handleRegister(body:IUserBody){
     try{
-      const validationBody=bodySchema.validate(body,{abortEarly:false});
+      const validationBody=regiterBodySchema.validate(body,{abortEarly:false});
       console.log((await validationBody).password as string)
-      let dcriptPassword=await bcrypt.hash((await validationBody).password as string ,parseInt(process.env.SALTPASSWORD as string));
-      let newUser=new UserModel({...(await validationBody),password:dcriptPassword});
+      let bcriptPassword=await bcrypt.hash((await validationBody).password as string ,parseInt(process.env.SALTPASSWORD as string));
+      let newUser=new UserModel({...(await validationBody),password:bcriptPassword});
       await newUser.save();
       return{
         status:"success",
@@ -94,11 +88,107 @@ export default class UserService{
     }
   }
 
-  handleLogin(body:ILoginUser){
-    console.log(otpStore,"jjjjjjjjjjj")
-    return {
-        status:"error",
-      
+  async handleLogin(body:ILoginUser){
+    if(!body){
+      return{
+        status:"fail",
+        message:"Email and Password are required"
       }
+    }
+    try{
+      let validateBody=await loginBodySchema.validate(body,{abortEarly:false});
+      let foundUser=await UserModel.findOne({email:validateBody.email});
+      if(!foundUser){
+        return{
+          status:"fail",
+          message:"Email Not Registered"
+        }
+      }
+      let matchedPassword=await bcrypt.compare(validateBody.password,foundUser.password);
+      const payload = {
+        id: foundUser._id,
+        email: foundUser.email,
+        role: foundUser.role
+      };
+      let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"})
+      console.log(matchedPassword);
+      if(matchedPassword){
+        return{
+          status:"success",
+          message:"Welcame in Our WebSite",
+          token
+        }
+      }else{
+        return{
+          status:"error",
+          message:"Password is not correct",
+        }
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+
+  async handleForgetPassword(body:{email:string}){
+    if(!body){
+      return{
+        status:"fail",
+        message:"Email is Registered"
+      }
+    }
+    try{
+      let userFounded=await UserModel.findOne({email:body.email});
+      if(!userFounded){
+        return{
+          status:"fail",
+          message:"Email Not Registered"
+        }
+      }
+      await sendEmail(userFounded)
+      return{
+        status:"success",
+        message:"Check your gmail account"
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleResetPassword(body:{email:string,password:string}){
+    if(!body){
+      return{
+        status:"fail",
+        message:"Email Not Found"
+      }
+    }
+    
+    try{
+      let validateBody=await loginBodySchema.validate(body);
+      let foundUser=await UserModel.findOne({email:validateBody.email});
+      if(!foundUser){
+        return{
+          status:"fail",
+          message:"Email is not Registered"
+        }
+      }
+      let bcriptPassword=await bcrypt.hash(body.password,parseInt(process.env.SALTPASSWORD as string ))
+      let updateUser=await UserModel.updateOne({email:validateBody.email},{$set:{password:bcriptPassword}})
+      if(updateUser.modifiedCount){
+        return{
+          status:"success",
+          message:"Password Updated"
+        }
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
   }
 }
