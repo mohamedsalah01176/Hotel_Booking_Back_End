@@ -26,12 +26,21 @@ export default class UserControler{
     let responseServer=await this.userService.handleRegister(body);
     ReponseStatues(responseServer,req,res)
   }
-
+  
   async login(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleLogin(body);
-    // console.log(responseServer);
-    res.status(200).json(responseServer);
-  
+    ReponseStatues(responseServer,req,res)  
+  }
+
+  async forgetPassword(req:Request,res:Response){
+    const body=req.body;
+    let responseServer=await this.userService.handleForgetPassword(body);
+    ReponseStatues(responseServer,req,res)  
+  }
+  async resetPassword(req:Request,res:Response){
+    const body=req.body;
+    let responseServer=await this.userService.handleResetPassword(body);
+    ReponseStatues(responseServer,req,res)  
   }
 }
