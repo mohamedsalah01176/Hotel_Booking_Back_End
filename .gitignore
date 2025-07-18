@@ -8,5 +8,5 @@
 node_modules/
 
 # Ignore build files
-dist/
+# dist/
 build/
