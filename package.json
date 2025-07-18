@@ -4,11 +4,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./dist/main.js",
+    "start": "node ./src/main.ts",
     "dev": "nodemon ./src/main.ts",
     "build": "tsc -p ./"
   },
   "author": "",
+  "engines":{
+    "node":"22.14.0",
+  },
   "license": "ISC",
   "description": "",
   "dependencies": {
