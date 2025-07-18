@@ -7,15 +7,21 @@ export const regiterBodySchema=yup.object({
   phone: yup.string().required('Phone is required'),
   email: yup.string().email("Email Not Valid").required('Email is required'),
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
-  role: yup.string().oneOf(['user', 'host', 'manager']),
+  role: yup.string().oneOf(['user', 'admin', 'manager'],"This Not Valid"),
   birthDate: yup.date().optional()
 })
 
 
 export const loginBodySchema=yup.object({
-  email:yup.string().email("Email Not Valid").required('Email is required'),
+  emailOrPhone:yup.string().test("email-or-phone","Invalid Phone Number Or Email",(value)=>testFunction(value as string)).required('Email is required'),
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
 })
 export const forgetPasswordBodySchema=yup.object({
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
 })
+
+const emailRGX =/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneRGX = /^\+?[1-9]\d{6,14}$/;
+export const testFunction=(value:string)=>{
+    return phoneRGX.test(value) || emailRGX.test(value)
+  }

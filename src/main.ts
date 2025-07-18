@@ -5,6 +5,7 @@ import userRouter from "./route/user";
 import { rateLimit } from 'express-rate-limit';
 import helmet from "helmet";
 import compression from "compression"
+import cors from 'cors';
 
 
 
@@ -39,6 +40,7 @@ app.use(helmet({
         action:"deny"
     }
 }))
+app.use(cors());
 
 app.use(compression());
 
