@@ -2,10 +2,12 @@ export interface IUserBody{
   name:string,
   phone:string,
   email:string,
-  role:'user' | 'host' | "manager",
-  birthDate:Date
+  password:string,
+  role:'user' | 'admin' | "manager",
+  birthDate:Date,
+  _id:string
 }
 export interface ILoginUser{
-  email:string,
+  emailOrPhone:string,
   password:string
 }

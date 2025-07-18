@@ -1,7 +1,7 @@
 import { ILoginUser, IUserBody } from "../interface/user";
 import bcrypt from "bcrypt"
 import UserModel from "../model/user";
-import { sendMessage } from "../util/sendMessage";
+import { sendMessageSMS, sendMessageWhatsUp } from "../util/sendMessage";
 import { forgetPasswordBodySchema, loginBodySchema, regiterBodySchema } from "../util/yapSchema";
 import { sendEmail } from "../util/sendEmail";
 import jwt from "jsonwebtoken";
@@ -13,26 +13,34 @@ let otpStore:{[key:string]:string}={};
 
 export default class UserService{
   constructor(){}
-  async handleSendCode(body:{phone:string}){
+  async handleSendCode(body:{phone:string, type?:string}){
     if(!body){
       return{
         status:'fail',
-        message:"The Phone is Required"
+        messageEn:"The Phone is Required",
+        messageAr:"يجب ادخال رقم التليفون",
       }
     }
     try{
+      console.log(body.phone,"phone")
       let code=Math.floor(100000+Math.random()*900000);
       otpStore[body.phone]=code.toString();
-      await sendMessage(code,body.phone);
+      if(body.type === "whatsApp"){
+        await sendMessageWhatsUp(code,body.phone);
+      }else{
+        await sendMessageSMS(code,body.phone);
+      }
       return{
         status:"success",
-        meessage:"Mesage Sended"
+        meessageEn:"Code Sended",
+        meessageAr:"تم ارسال الكود",
       }
     }catch(errors:any){
       if(errors.code === 11000 && errors.keyPattern?.email){
         return {
           status:"fail",
-          message:"this email is already registered"
+          messageEn:"this email is already registered",
+          messageAr:"تم تسجيل الايميل من قبل"
         }
       }
       return{
@@ -46,20 +54,24 @@ export default class UserService{
     if(!body){
       return{
           status:'fail',
-          message:"The Phone is Required"
+          messageEn:"The Phone is Required",
+          messageAr:"يجب ادخال رقم التليفون",
         }
     }
     try{
-      if(body.code === otpStore[body.phone]){
-        delete otpStore[body.phone];
+      if(body.code !== otpStore[body.phone]){
         return{
-          status:"success",
-          message:"verfiy correct"
+          status:"fail",
+          messageEn:"Sorry, we are not able to verify the code. Please make sure you input the right mobile number and code.",
+          messageAr: "عذرًا، لا يمكننا التحقق من الرمز. يرجى التأكد من إدخال رقم الهاتف والرمز الصحيح"
         }
       }
+      delete otpStore[body.phone];
+      await UserModel.updateOne({phone:body.phone},{$set:{phoneVerfy:true}});
       return{
-        status:"fail",
-        message:"code is incorrect"
+        status:"success",
+        messageEn:"verfiy correct",
+        messageAr:"التحقيق صحيح",
       }
     }catch(errors){
       return{
@@ -71,14 +83,32 @@ export default class UserService{
 
   async handleRegister(body:IUserBody){
     try{
+      const foundUser=await UserModel.findOne({$or:[{email:body.email},{phone:body.phone}]});
+      if(foundUser){
+        return{
+          status:"fail",
+          messageEn:"The Email Or Phone Aready Registered",
+          messageAr:"تم تسجيل الايميل او الفون من قبل",
+        }
+      }
+      
       const validationBody=regiterBodySchema.validate(body,{abortEarly:false});
       console.log((await validationBody).password as string)
       let bcriptPassword=await bcrypt.hash((await validationBody).password as string ,parseInt(process.env.SALTPASSWORD as string));
       let newUser=new UserModel({...(await validationBody),password:bcriptPassword});
       await newUser.save();
+      console.log(newUser);
+      const payload = {
+        id: newUser._id,
+        email: newUser.email,
+        role: newUser.role
+      };
+      let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
       return{
         status:"success",
-        message:"user Created"
+        messageEn:"user Created",
+        messageAr:"تم انشاء المستخدم",
+        token
       }
     }catch(errors){
       return {
@@ -92,36 +122,48 @@ export default class UserService{
     if(!body){
       return{
         status:"fail",
-        message:"Email and Password are required"
+        messageEn:"Email and Password are required",
+        messageAr:"يجب ادجال الايميل وكلمه السر",
       }
     }
     try{
       let validateBody=await loginBodySchema.validate(body,{abortEarly:false});
-      let foundUser=await UserModel.findOne({email:validateBody.email});
+      let foundUser:IUserBody | null;
+      if(validateBody.emailOrPhone.startsWith("+2")){
+        foundUser=await UserModel.findOne({phone:validateBody.emailOrPhone});
+      }else{
+        foundUser=await UserModel.findOne({email:validateBody.emailOrPhone});
+      }
+      console.log(foundUser)
       if(!foundUser){
         return{
           status:"fail",
-          message:"Email Not Registered"
+          messageEn:"Email Not Registered",
+          messageAr:"الايميل غير مسجل"
         }
       }
       let matchedPassword=await bcrypt.compare(validateBody.password,foundUser.password);
       const payload = {
         id: foundUser._id,
         email: foundUser.email,
+        phone: foundUser.phone,
         role: foundUser.role
       };
-      let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"})
+      let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
+      console.log(validateBody.password);
       console.log(matchedPassword);
       if(matchedPassword){
         return{
           status:"success",
-          message:"Welcame in Our WebSite",
+          messageEn:"Welcame in Our WebSite",
+          messageAr:"مرحبا بك في موقعنا",
           token
         }
       }else{
         return{
           status:"error",
-          message:"Password is not correct",
+          messageEn:"Password is not correct",
+          messageAr:"كلمه السر غير صحيحيه",
         }
       }
     }catch(errors){
@@ -136,7 +178,8 @@ export default class UserService{
     if(!body){
       return{
         status:"fail",
-        message:"Email is Registered"
+        messageEn:"Email is Required",
+        messageAr:"يجب ادخال الايميل",
       }
     }
     try{
@@ -144,13 +187,15 @@ export default class UserService{
       if(!userFounded){
         return{
           status:"fail",
-          message:"Email Not Registered"
+          messageُى:"Email Not Registered",
+          messageAr:"الايميل غير مسجل"
         }
       }
       await sendEmail(userFounded)
       return{
         status:"success",
-        message:"Check your gmail account"
+        messageEn:"Check your gmail account",
+        messageAr:"افحص الجيميل الخاص بك"
       }
     }catch(errors){
       return{
@@ -159,29 +204,32 @@ export default class UserService{
       }
     }
   }
-  async handleResetPassword(body:{email:string,password:string}){
+  async handleResetPassword(body:{emailOrPhone:string,password:string}){
     if(!body){
       return{
         status:"fail",
-        message:"Email Not Found"
+        messageEn:"Email Not Found",
+        messageAr:"الايميل غير مسجل",
       }
     }
     
     try{
       let validateBody=await loginBodySchema.validate(body);
-      let foundUser=await UserModel.findOne({email:validateBody.email});
+      let foundUser=await UserModel.findOne({email:validateBody.emailOrPhone});
       if(!foundUser){
         return{
           status:"fail",
-          message:"Email is not Registered"
+          messageEn:"Email is not Registered",
+          messageAr:"البريد الإلكتروني غير مسجّل"
         }
       }
       let bcriptPassword=await bcrypt.hash(body.password,parseInt(process.env.SALTPASSWORD as string ))
-      let updateUser=await UserModel.updateOne({email:validateBody.email},{$set:{password:bcriptPassword}})
+      let updateUser=await UserModel.updateOne({email:validateBody.emailOrPhone},{$set:{password:bcriptPassword}})
       if(updateUser.modifiedCount){
         return{
           status:"success",
-          message:"Password Updated"
+          messageEn:"Password Updated",
+          messageAr:"تم تحديث كلمه السر",
         }
       }
     }catch(errors){
