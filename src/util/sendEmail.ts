@@ -12,7 +12,7 @@ export async function sendEmail(userFounded:{email:string}){
     secure: true,
     port: 465,
   })
-  let resetLink=`https://hotel-booking-front-end-x8sw.vercel.app/resetPassword?email=${userFounded.email}`;
+  let resetLink=`http://localhost:5173/resetPassword?email=${userFounded.email}`;
   let emailContent = {
       from: `"Support Team" <${process.env.AUTHEMAIL}>`,
       to: userFounded.email,
