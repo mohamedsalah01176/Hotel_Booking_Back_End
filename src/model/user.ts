@@ -8,11 +8,12 @@ const Schema=new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true
+    required: true,
+    unique:true
   },
   role: {
     type: String,
-    enum: ['host', 'user', 'manager'], 
+    enum: ['admin', 'user', 'manager'], 
     default: 'user',
     required:true
   },
@@ -31,6 +32,11 @@ const Schema=new mongoose.Schema({
     required:true,
     minlength: 8,
     match: [/(?=.*[a-zA-Z])(?=.*\d)/, 'Password must contain at least one letter and one number']
+  },
+  phoneVerfy:{
+    type:Boolean,
+    required:true,
+    default:false
   }
 },{
   timestamps: true
