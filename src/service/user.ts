@@ -101,7 +101,8 @@ export default class UserService{
       const payload = {
         id: newUser._id,
         email: newUser.email,
-        role: newUser.role
+        role: newUser.role,
+        image:newUser?.image
       };
       let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
       return{
@@ -138,7 +139,7 @@ export default class UserService{
       if(!foundUser){
         return{
           status:"fail",
-          messageEn:"Email Not Registered",
+          messageEn:"Email Or Phone Not Registered",
           messageAr:"الايميل غير مسجل"
         }
       }

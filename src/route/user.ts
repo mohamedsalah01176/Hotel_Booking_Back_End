@@ -1,4 +1,4 @@
-import { Request,Response, Router } from "express";
+import {  Router } from "express";
 import UserService from "../service/user";
 import UserControler from "../controler/user";
 

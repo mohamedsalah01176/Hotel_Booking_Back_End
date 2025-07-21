@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import {  Response } from "express";
 
-export function ReponseStatues(responseServer:any,req:Request,res:Response){
+export function ReponseStatues(responseServer:any,res:Response){
   if(responseServer.status === "success"){
       res.status(200).json(responseServer);
     }else if(responseServer.status === "fail"){
