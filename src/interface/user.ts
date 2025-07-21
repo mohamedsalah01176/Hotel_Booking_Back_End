@@ -3,11 +3,19 @@ export interface IUserBody{
   phone:string,
   email:string,
   password:string,
-  role:'user' | 'admin' | "manager",
+  role:'user' | 'host' | "manager",
   birthDate:Date,
   _id:string
 }
 export interface ILoginUser{
-  emailOrPhone:string,
+  emailOrPhone:string, 
   password:string
+}
+
+export interface IUserPayload {
+  _id: string;
+  role: "manager" | "host" | "user";
+  email: string;
+  image?:string,
+    name?: string;
 }

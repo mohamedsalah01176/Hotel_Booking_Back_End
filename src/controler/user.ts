@@ -13,34 +13,34 @@ export default class UserControler{
   async sendCode(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleSendCode(body);
-    ReponseStatues(responseServer,req,res)
+    ReponseStatues(responseServer,res)
   }
   async verfyCode(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleVerfyCode(body);
-    ReponseStatues(responseServer,req,res)
+    ReponseStatues(responseServer,res)
   }
 
   async register(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleRegister(body);
-    ReponseStatues(responseServer,req,res)
+    ReponseStatues(responseServer,res)
   }
   
   async login(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleLogin(body);
-    ReponseStatues(responseServer,req,res)  
+    ReponseStatues(responseServer,res)  
   }
 
   async forgetPassword(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleForgetPassword(body);
-    ReponseStatues(responseServer,req,res)  
+    ReponseStatues(responseServer,res)  
   }
   async resetPassword(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleResetPassword(body);
-    ReponseStatues(responseServer,req,res)  
+    ReponseStatues(responseServer,res)  
   }
 }
