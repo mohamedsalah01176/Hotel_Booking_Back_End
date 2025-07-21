@@ -6,6 +6,7 @@ import { rateLimit } from 'express-rate-limit';
 import helmet from "helmet";
 import compression from "compression"
 import cors from 'cors';
+import propertyRouter from "./route/property";
 
 
 
@@ -46,6 +47,7 @@ app.use(compression());
 
 
 app.use("/api",userRouter)
+app.use("/api",propertyRouter)
 
 app.get('/', (_req, res) => {
   res.send('API is working 🎉');
