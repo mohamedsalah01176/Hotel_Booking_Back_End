@@ -13,7 +13,7 @@ const Schema=new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'user', 'manager'], 
+    enum: ['host', 'user', 'manager'], 
     default: 'user',
     required:true
   },
@@ -37,6 +37,9 @@ const Schema=new mongoose.Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  image:{
+    type:String,
   }
 },{
   timestamps: true
