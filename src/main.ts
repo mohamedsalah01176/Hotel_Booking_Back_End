@@ -7,6 +7,7 @@ import helmet from "helmet";
 import compression from "compression"
 import cors from 'cors';
 import propertyRouter from "./route/property";
+import cityRouter from "./route/city";
 
 
 
@@ -48,6 +49,7 @@ app.use(compression());
 
 app.use("/api",userRouter)
 app.use("/api",propertyRouter)
+app.use("/api",cityRouter)
 
 
 app.use((req:Request,res:Response)=>{
