@@ -6,7 +6,7 @@ export default class CityService{
       const cities=await CityModel.find({});
       if(cities.length>0){
         return{
-          status:"succes",
+          status:"success",
           cities
         }
       }else{
