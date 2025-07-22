@@ -1,15 +1,20 @@
 import { IProperty } from "../interface/property";
 import {  IUserPayload } from "../interface/user";
-import PropertyModelAr from "../model/propertyAr";
-import PropertyModelEn from "../model/propertyEn";
-import { translateToAr } from "../util/translateToAr";
+import PropertyModel from "../model/property";
+import { translateToArLogic, translateToEnLogic } from "../util/translateLogic";
 import { propertySchema } from "../util/yapSchema";
 
 export class PropertyService{
 
-  async handleAllProperties(){
+  async handleAllProperties(lang:string){
     try{
-      const properties=await PropertyModelEn.find({});
+      const properties=await PropertyModel.find({});
+      // let properties:IProperty[];
+      // if(lang === "ar"){
+      //   properties=await PropertyModelAr.find({});
+      // }else{
+      //   properties=await PropertyModelEn.find({});
+      // }
       return{
         status:"success",
         properties
@@ -21,9 +26,15 @@ export class PropertyService{
       }
     }
   }
-  async handleSpecificProperty(propertyId:string){
+  async handleSpecificProperty(propertyId:string,lang:string){
     try{
-      const property=await PropertyModelEn.find({_id:propertyId});
+      const property=await PropertyModel.findOne({_id:propertyId});
+      // let property;
+      // if(lang === "ar"){
+      //   property=await PropertyModelAr.findOne({_id:propertyId});
+      // }else{
+      //   property=await PropertyModelEn.findOne({_id:propertyId});
+      // }
       if(property){
         return{
           status:"success",
@@ -42,7 +53,7 @@ export class PropertyService{
       }
     }
   }
-  async handleAddProperties(body:IProperty,adminBody:IUserPayload){
+  async handleAddProperties(body:IProperty,adminBody:IUserPayload,lang:string){
     if(adminBody.role !== "host"){
       return {
         status:"fail",
@@ -51,12 +62,11 @@ export class PropertyService{
     }
     try{
       const validbody=await propertySchema.validate(body,{abortEarly:false});
-      const newProperties=new PropertyModelEn({...validbody,admin:adminBody});
-      await newProperties.save()
-      const translatedBody= await translateToAr(body);
-      console.log(translatedBody,"servise")
-      const newPropertyAr=new PropertyModelAr({...translatedBody,admin:adminBody});
-      await newPropertyAr.save();
+      if(lang === "ar"){
+        await translateToEnLogic(body,adminBody)
+      }else{
+        await translateToArLogic(body,adminBody)
+      }
       return{
         status:"success",
         message:"Property Added"
