@@ -9,7 +9,7 @@ const router =Router();
 const cityService=new CityService();
 const cityController=new CityController(cityService);
 
-router.get("/property",(req,res)=>cityController.allCities(req,res))
+router.get("/city",(req,res)=>cityController.allCities(req,res))
 
 
 
