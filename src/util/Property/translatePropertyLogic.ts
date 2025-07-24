@@ -1,7 +1,7 @@
-import { IProperty } from "../interface/property";
-import { IUserPayload } from "../interface/user";
-import CityModel from "../model/city";
-import PropertyModel from "../model/property";
+import { IProperty } from "../../interface/property";
+import { IUserPayload } from "../../interface/user";
+import CityModel from "../../model/city";
+import PropertyModel from "../../model/property";
 import { translateToAr } from "./translateToAr";
 import { translateToEn } from "./translateToEn";
 

@@ -1,17 +1,35 @@
 import { Types } from "mongoose";
 
 export interface IReview {
-  userId: Types.ObjectId;
-  comment: string;
+  _id: Types.ObjectId;
+  user: {
+    name: string;
+    image: string;
+    role: string;
+    email: string;
+  };
+  data: string;
+  dataEn: string;
+  dataAr: string;
   rating: number;
   createdAt?: Date;
+  updatedAt?: Date;
+}
+export interface IReviewBody {
+  data: string;
+  dataAr?: string;
+  dataEn?: string;
+  rating: number;
 }
 
 export interface IAdmin {
+  _id?: string;
   name: string;
   email: string;
   phone: string;
-  image?: string;
+  image: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ILocation {
@@ -24,50 +42,36 @@ export interface ILocation {
 }
 
 export interface IProperty {
+  _id?: Types.ObjectId;
   title: string;
   titleEn?: string;
   titleAr?: string;
   description: string;
   descriptionEn?: string;
   descriptionAr?: string;
-  category: string;
+  category: "home" | "department";
+  rate: number;
+  reviews: IReview[];
+  admin: IAdmin;
+  images: string[];
+  nightPrice: number;
   guestNumber: number;
+  services: {
+    service: string;
+    serviceEn?: string;
+    serviceAr?: string;
+  }[];
+  ordersNumbers?: number;
   location: {
     city: string;
-    cityEn: string;
-    cityAr: string;
+    cityEn?: string;
+    cityAr?: string;
     address: string;
-    addressEn: string;
-    addressAr: string;
+    addressEn?: string;
+    addressAr?: string;
     coordinates: {
       lat: number;
       lng: number;
     };
   };
-  images: string[];
-  reviews: {
-    userId: string;
-    comment: string;
-    rating: number;
-  }[];
-  reviewsEn: {
-    userId: string;
-    comment: string;
-    rating: number;
-  }[];
-  reviewsAr: {
-    userId: string;
-    comment: string;
-    rating: number;
-  }[];
-  services: string[];
-  servicesEn: string[];
-  servicesAr: string[];
-  admin: {
-    name: string;
-    email: string;
-    phone: string;
-    image?: string;
-  };
-  nightPrice: number;
 }
