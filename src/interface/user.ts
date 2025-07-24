@@ -5,7 +5,10 @@ export interface IUserBody{
   password:string,
   role:'user' | 'host' | "manager",
   birthDate:Date,
-  _id:string
+  _id:string,
+  image:string,
+  phoneVerfy:boolean,
+  createdAt:Date
 }
 export interface ILoginUser{
   emailOrPhone:string, 
@@ -17,5 +20,7 @@ export interface IUserPayload {
   role: "manager" | "host" | "user";
   email: string;
   image?:string,
-    name?: string;
+  name?: string;
+  createdAt:Date;
+  phoneVerfy:boolean;
 }

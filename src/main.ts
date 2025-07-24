@@ -8,6 +8,7 @@ import compression from "compression"
 import cors from 'cors';
 import propertyRouter from "./route/property";
 import cityRouter from "./route/city";
+import reviewRouter from "./route/review";
 
 
 
@@ -17,6 +18,7 @@ const Port=process.env.PORT;
 const Mongo_URL=process.env.MONGO_URL as string;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /*const limiter=rateLimit({
      windowMs:15 * 60 * 1000, //  15 minutes
@@ -50,6 +52,7 @@ app.use(compression());
 app.use("/api",userRouter)
 app.use("/api",propertyRouter)
 app.use("/api",cityRouter)
+app.use("/api",reviewRouter)
 
 
 app.use((req:Request,res:Response)=>{

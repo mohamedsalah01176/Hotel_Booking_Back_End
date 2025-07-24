@@ -1,7 +1,10 @@
-import { IProperty } from "../interface/property";
+import { IProperty } from "../../interface/property";
+import { parseServicesFromFlatBody } from "../parseServicesFromFlatBody";
 const translate = require("translate-google");
 
-export const translateToAr = async (body: IProperty): Promise<IProperty> => {
+export const translateToAr = async (body: IProperty ): Promise<IProperty> => {
+    parseServicesFromFlatBody(body)
+
   const translated: IProperty = JSON.parse(JSON.stringify(body));
 
   try {
@@ -23,28 +26,24 @@ export const translateToAr = async (body: IProperty): Promise<IProperty> => {
       translated.location.addressAr = await translate(body.location.address, { from: "en", to: "ar" });
     }
 
-    if (Array.isArray(body.services)) {
-      translated.servicesEn = [];
-      translated.servicesAr = [];
-
+    if (Array.isArray(body.services) && body.services.length > 0) {
+      translated.services = [];
       for (const service of body.services) {
-        translated.servicesEn.push(service);
-        const translatedService = await translate(service, { from: "en", to: "ar" });
-        translated.servicesAr.push(translatedService);
+        const translatedService = await translate(service.service || "", { from: "en", to: "ar" });
+        translated.services.push({service:service.service,serviceEn:service.service,serviceAr:translatedService});
       }
     }
 
-    if (Array.isArray(body.reviews)) {
-      translated.reviewsEn = [];
-      translated.reviewsAr = [];
+    if (Array.isArray(body.reviews) && body.reviews.length > 0) {
+      translated.reviews = [];
 
       for (const review of body.reviews) {
-        translated.reviewsEn.push(review);
-        const translatedComment = await translate(review.comment || "", { from: "en", to: "ar" });
-        translated.reviewsAr.push({ ...review, comment: translatedComment });
+        const translatedComment = await translate(review.data || "", { from: "en", to: "ar" });
+        translated.reviews.push({...review,data:review.data,dataEn:review.data,dataAr:translatedComment});
       }
     }
-
+    console.log(body,"before")
+    console.log(translated,"after")
     return translated;
   } catch (err) {
     console.error("❌ Translation Error:", err);

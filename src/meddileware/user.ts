@@ -43,6 +43,7 @@ export const authorizationForHost=(req:Request,res:Response,next:NextFunction)=>
   let token = authHearder.split(" ")[1];
   try{
     const decod =jwt.verify(token,process.env.SECTERTOKENKEY as string) as JwtPayload
+    console.log(decod)
     if(decod.role == "host"){
       next();
     }else{
