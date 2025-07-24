@@ -1,7 +1,7 @@
 import { IProperty } from "../interface/property";
 import {  IUserPayload } from "../interface/user";
 import PropertyModel from "../model/property";
-import { translateToArLogic, translateToEnLogic } from "../util/translateLogic";
+import { translateToArLogic, translateToEnLogic } from "../util/Property/translatePropertyLogic";
 import { propertySchema } from "../util/yapSchema";
 
 export class PropertyService{

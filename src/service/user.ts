@@ -97,12 +97,14 @@ export default class UserService{
       let bcriptPassword=await bcrypt.hash((await validationBody).password as string ,parseInt(process.env.SALTPASSWORD as string));
       let newUser=new UserModel({...(await validationBody),password:bcriptPassword});
       await newUser.save();
-      console.log(newUser);
       const payload = {
         id: newUser._id,
+        name:newUser.name,
         email: newUser.email,
         role: newUser.role,
-        image:newUser?.image
+        image:newUser?.image,
+        phoneVerfy:newUser?.phoneVerfy,
+        createdAt:newUser.createdAt
       };
       let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
       return{
@@ -146,9 +148,12 @@ export default class UserService{
       let matchedPassword=await bcrypt.compare(validateBody.password,foundUser.password);
       const payload = {
         id: foundUser._id,
+        name:foundUser.name,
         email: foundUser.email,
-        phone: foundUser.phone,
-        role: foundUser.role
+        role: foundUser.role,
+        image:foundUser?.image,
+        phoneVerfy:foundUser?.phoneVerfy,
+        createdAt:foundUser.createdAt
       };
       let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
       console.log(validateBody.password);
