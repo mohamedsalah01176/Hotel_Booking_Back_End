@@ -9,14 +9,14 @@ export default class ReviewServices{
 
 
   async handleAddReview(body:IReviewBody,user:IUserBody,propertyId:string,lang:string){
+    console.log(user)
     try{
       let propertyUpdated : UpdateResult ;
       if(lang === "en"){
         console.log(lang)
         const translaedBody=await translateToAr(body)
-        propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{_id:propertyId,...translaedBody,user}}});
+        propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{_id:propertyId,...translaedBody,user:user}}});
       }else{
-        console.log("ddddddd")
         const translaedBody=await translateToEn(body)
         propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{_id:propertyId,...translaedBody,user}}});
       }
