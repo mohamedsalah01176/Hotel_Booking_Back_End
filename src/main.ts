@@ -9,6 +9,7 @@ import cors from 'cors';
 import propertyRouter from "./route/property";
 import cityRouter from "./route/city";
 import reviewRouter from "./route/review";
+import reservRouter from "./route/reservDates";
 
 
 
@@ -53,6 +54,7 @@ app.use("/api",userRouter)
 app.use("/api",propertyRouter)
 app.use("/api",cityRouter)
 app.use("/api",reviewRouter)
+app.use("/api",reservRouter)
 
 
 app.use((req:Request,res:Response)=>{
