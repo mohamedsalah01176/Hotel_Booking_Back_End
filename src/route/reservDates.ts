@@ -1,7 +1,7 @@
 import { Router } from "express";
 import ReservDatesController from "../controler/reservDates";
 import { authentication } from "../meddileware/user";
-import { ReservDatesService } from "../service/ReservDates";
+import  ReservDatesService  from "../service/ReservDates";
 
 const router =Router();
 
