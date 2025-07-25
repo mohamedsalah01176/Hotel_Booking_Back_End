@@ -21,6 +21,7 @@ export interface IUserPayload {
   email: string;
   image?:string,
   name?: string;
+  phone?: string;
   createdAt:Date;
   phoneVerfy:boolean;
 }
