@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import ReservDatesService from "../service/ReservDates";
 import { ReponseStatues } from "../util/ResponseStatus";
 import { IUserPayload } from "../interface/user";
+import  ReservDatesService  from "../service/ReservDates";
 
 export default class ReservDatesController{
   constructor(private reverveDateService:ReservDatesService){}
