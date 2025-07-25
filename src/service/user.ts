@@ -98,10 +98,11 @@ export default class UserService{
       let newUser=new UserModel({...(await validationBody),password:bcriptPassword});
       await newUser.save();
       const payload = {
-        id: newUser._id,
+        _id: newUser._id,
         name:newUser.name,
         email: newUser.email,
         role: newUser.role,
+        phone:newUser.phone,
         image:newUser?.image,
         phoneVerfy:newUser?.phoneVerfy,
         createdAt:newUser.createdAt
@@ -147,9 +148,10 @@ export default class UserService{
       }
       let matchedPassword=await bcrypt.compare(validateBody.password,foundUser.password);
       const payload = {
-        id: foundUser._id,
+        _id: foundUser._id,
         name:foundUser.name,
         email: foundUser.email,
+        phone:foundUser.phone,
         role: foundUser.role,
         image:foundUser?.image,
         phoneVerfy:foundUser?.phoneVerfy,
