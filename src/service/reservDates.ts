@@ -3,7 +3,7 @@ import PropertyModel from "../model/property";
 import { ReserveDateModel } from "../model/ReservDates";
 import { DateSchema } from "../util/yapSchema";
 
-export default class ReservDatesService{
+export class ReservDatesService{
   async handleRevesveDates(user:IUserPayload,body:{startDate:Date,endDate:Date},propertyId:string){
     if(user.role !== "user"){
       return{
