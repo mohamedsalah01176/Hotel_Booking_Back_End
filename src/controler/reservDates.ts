@@ -12,4 +12,10 @@ export default class ReservDatesController{
     const responseServicer= await this.reverveDateService.handleRevesveDates(user,body,propertyId);
     ReponseStatues(responseServicer,res)
   }
+  
+  async getReserveDateForProperty(req:Request,res:Response){
+    const propertyId=req.params.propertyId;
+    const responseServicer= await this.reverveDateService.handleGetReserveDateForProperty(propertyId);
+    ReponseStatues(responseServicer,res)
+  }
 }
