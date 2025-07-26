@@ -1,7 +1,7 @@
 {
   "name": "back-end",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./dist/main.js",
@@ -9,6 +9,9 @@
     "build": "tsc -p ./"
   },
   "author": "",
+  "engines":{
+    "node":"22.14.0"
+  },
   "license": "ISC",
   "description": "",
   "dependencies": {
