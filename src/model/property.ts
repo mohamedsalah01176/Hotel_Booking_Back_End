@@ -28,6 +28,7 @@ const adminSchema = new mongoose.Schema({
   email: String,
   phone: String,
   image:String,
+  phoneVerfy:Boolean,
   createdAt:Date
 });
 
