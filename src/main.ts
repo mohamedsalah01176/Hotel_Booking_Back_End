@@ -56,6 +56,9 @@ app.use("/api",cityRouter)
 app.use("/api",reviewRouter)
 app.use("/api",reservRouter)
 
+app.get('/', (_req, res) => {
+  res.send('API is working 🎉');
+});
 
 app.use((req:Request,res:Response)=>{
   if(req.originalUrl.startsWith('/api')){
