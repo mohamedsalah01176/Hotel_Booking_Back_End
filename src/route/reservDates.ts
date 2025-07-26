@@ -11,6 +11,7 @@ const reservController=new ReservDatesController(resvervService)
 
 
 router.post("/reserve/:propertyId",authentication,(req,res)=>reservController.revesveDates(req,res))
+router.get("/reserve/:propertyId",authentication,(req,res)=>reservController.getReserveDateForProperty(req,res))
 
 
 

@@ -33,4 +33,26 @@ export default class ReservDatesService{
       }
     }
   }
+ 
+  async handleGetReserveDateForProperty(propertyId:string){
+    try{
+      const foundHotal= await ReserveDateModel.findOne({propertyId:propertyId});
+      if(foundHotal){
+        return{
+          status:"success",
+          property:foundHotal
+        }
+      }else{
+        return{
+          status:"success",
+          message:"Property Not Found"
+        }
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
 }
