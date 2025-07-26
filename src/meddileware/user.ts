@@ -14,7 +14,8 @@ interface JwtPayload {
   role: string;
   email?: string;
   name?: string;
-  image:string
+  phoneVerfy:boolean;
+  image:string;
 } 
 export const authentication =(req:Request,res:Response,next:NextFunction)=>{
   const authHeader  =req.headers["Authorization"] as string || req.headers["authorization"] as string;
@@ -27,6 +28,7 @@ export const authentication =(req:Request,res:Response,next:NextFunction)=>{
   
   try{
     const decoded = jwt.verify(token, process.env.SECTERTOKENKEY as string) as JwtPayload;
+    console.log(decoded)
     req.user = decoded;
     next()
   }catch (error) {
