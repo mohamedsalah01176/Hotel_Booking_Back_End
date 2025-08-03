@@ -49,13 +49,16 @@ export interface IProperty {
   description: string;
   descriptionEn?: string;
   descriptionAr?: string;
-  category: "home" | "department";
+  category: "home" | "partment";
   rate: number;
   reviews: IReview[];
   admin: IAdmin;
   images: string[];
   nightPrice: number;
   guestNumber: number;
+  bathroomNumber: number;
+  badroomNumber: number;
+  bedNumber: number;
   services: {
     service: string;
     serviceEn?: string;

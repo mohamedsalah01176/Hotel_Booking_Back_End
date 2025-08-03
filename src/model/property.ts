@@ -60,7 +60,7 @@ const propertySchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ["home", "department"]
+    enum: ["home", "partment"]
   },
   rate: {
     type: Number,
@@ -77,6 +77,21 @@ const propertySchema = new mongoose.Schema({
     min: 0
   },
   guestNumber: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  bathroomNumber: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  badroomNumber: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  bedNumber: {
     type: Number,
     required: true,
     min: 1

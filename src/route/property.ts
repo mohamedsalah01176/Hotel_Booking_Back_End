@@ -10,8 +10,9 @@ const propertyService=new PropertyService();
 const propertyController=new PropertyController(propertyService);
 
 router.get("/property",(req,res)=>propertyController.allProperty(req,res))
+router.get("/propertyForAdmin",authentication,(req,res)=>propertyController.getPropertyForAdmin(req,res))
 router.get("/property/:propertyId",(req,res)=>propertyController.specificProperty(req,res))
-router.post("/property",authentication,authorizationForHost,upload.array("images",5),(req,res)=>propertyController.addProperty(req,res))
+router.post("/property",authentication,upload.array("images",30),(req,res)=>propertyController.addProperty(req,res))
 
 
 

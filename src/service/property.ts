@@ -54,13 +54,14 @@ export class PropertyService{
     }
   }
   async handleAddProperties(body:IProperty,adminBody:IUserPayload,lang:string){
-    if(adminBody.role !== "host"){
+    if(adminBody.role === "user"){
       return {
         status:"fail",
         message: "Access denied. Only hosts can perform this action."
       };
     }
     try{
+      console.log(body)
       const validbody=await propertySchema.validate(body,{abortEarly:false});
       if(lang === "ar"){
         await translateToEnLogic(body,adminBody)
@@ -71,6 +72,35 @@ export class PropertyService{
         status:"success",
         message:"Property Added"
       }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleGetPropertyForAdmin(adminBody:IUserPayload){
+    console.log(adminBody)
+    if(adminBody.role === "user"){
+      return {
+        status:"fail",
+        message: "Access denied. Only hosts can perform this action."
+      };
+    }
+    try{
+      const foundProperts=await PropertyModel.find({"admin._id":adminBody._id});
+      if(foundProperts.length>0){
+        return{
+          status:"success",
+          properties:foundProperts
+        }
+      }else{
+        return{
+          status:"fail",
+          message:"This admin have not any properties"
+        }
+      }
+      
     }catch(errors){
       return{
         status:"error",
