@@ -26,4 +26,9 @@ export default class PropertyController{
     let responseServer= await this.propertyService.handleAddProperties({...body,images},adminBody,lang)
     ReponseStatues(responseServer,res);
   }
+  async getPropertyForAdmin(req:Request,res:Response){
+    const adminBody:IUserPayload=req.user as IUserPayload;
+    let responseServer= await this.propertyService.handleGetPropertyForAdmin(adminBody)
+    ReponseStatues(responseServer,res);
+  }
 }
