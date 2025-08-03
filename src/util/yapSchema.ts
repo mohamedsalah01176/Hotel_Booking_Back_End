@@ -30,8 +30,11 @@ export const testFunction=(value:string)=>{
 export const propertySchema=yup.object({
   title:yup.string().required("Title is required").min(3,"Title must be at least 3 characters"),
   description:yup.string().required("Description is required").min(3,"Title must be at least 3 characters"),
-  category:yup.string().required("Category is required").oneOf(["home","department"],"Invalid category"),
+  category:yup.string().required("Category is required").oneOf(["home","partment"],"Invalid category"),
   guestNumber:yup.number().required("Gest Number is required").min(1,"At least one guest is required"),
+  bathroomNumber:yup.number().required("Bathroom Number is required").min(1,"At least one guest is required"),
+  badroomNumber:yup.number().required("Badroom Number is required").min(1,"At least one guest is required"),
+  bedNumber:yup.number().required("Bed Number is required").min(1,"At least one guest is required"),
   services:yup.array().of(yup.string()).min(1, "At least one service is required"),
   reviews:yup.array().of(yup.string()),
   images:yup.array().min(1, "At least one service is required"),
