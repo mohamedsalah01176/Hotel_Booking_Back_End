@@ -105,6 +105,10 @@ const propertySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
   location: {
     city: { type: String, required: true },
     cityEn: { type: String },
