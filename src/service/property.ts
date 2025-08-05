@@ -165,7 +165,7 @@ export class PropertyService{
       foundProperty.save()
       return{
         status:"success",
-        message:"Property is Active"
+        message:"Property is Stoped"
       }
     }catch(errors){
       return{
@@ -193,7 +193,7 @@ export class PropertyService{
       foundProperty.save()
       return{
         status:"success",
-        message:"Property is Stoped"
+        message:"Property is Active"
       }
     }catch(errors){
       return{
