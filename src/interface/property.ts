@@ -59,6 +59,7 @@ export interface IProperty {
   bathroomNumber: number;
   badroomNumber: number;
   bedNumber: number;
+  isActive: boolean;
   services: {
     service: string;
     serviceEn?: string;

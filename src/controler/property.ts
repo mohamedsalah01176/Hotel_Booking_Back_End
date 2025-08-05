@@ -31,4 +31,24 @@ export default class PropertyController{
     let responseServer= await this.propertyService.handleGetPropertyForAdmin(adminBody)
     ReponseStatues(responseServer,res);
   }
+  async updateProperty(req:Request,res:Response){
+    const lang=req.query.lang  as string || "en";
+    const user=req.user as IUserBody;
+    const propertyId=req.params.propertyId;
+    const body=req.body;
+    let responseServer= await this.propertyService.handleUpdateProperty(body,user,propertyId,lang)
+    ReponseStatues(responseServer,res);
+  }
+  async DeActiveProperty(req:Request,res:Response){
+    const user=req.user as IUserBody;
+    const propertyId=req.params.propertyId;
+    let responseServer= await this.propertyService.handleDeActiveProperty(user,propertyId)
+    ReponseStatues(responseServer,res);
+  }
+  async ActiveProperty(req:Request,res:Response){
+    const user=req.user as IUserBody;
+    const propertyId=req.params.propertyId;
+    let responseServer= await this.propertyService.handleActiveProperty(user,propertyId)
+    ReponseStatues(responseServer,res);
+  }
 }
