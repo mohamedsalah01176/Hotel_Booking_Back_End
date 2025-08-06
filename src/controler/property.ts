@@ -33,10 +33,12 @@ export default class PropertyController{
   }
   async updateProperty(req:Request,res:Response){
     const lang=req.query.lang  as string || "en";
+    const files=req.files as Express.Multer.File[];
+    const images = files?.map(file=>file.path);
     const user=req.user as IUserBody;
     const propertyId=req.params.propertyId;
     const body=req.body;
-    let responseServer= await this.propertyService.handleUpdateProperty(body,user,propertyId,lang)
+    let responseServer= await this.propertyService.handleUpdateProperty({...body,images},user,propertyId,lang)
     ReponseStatues(responseServer,res);
   }
   async DeActiveProperty(req:Request,res:Response){
