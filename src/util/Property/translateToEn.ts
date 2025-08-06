@@ -17,8 +17,8 @@ export const translateToEn = async (body: IProperty): Promise<IProperty> => {
     }
 
     if (body.location.city) {
-      translatedBody.location.cityAr = body.location.city.toLowerCase();
-      translatedBody.location.cityEn = (await translate(body.location.city, { from: "ar", to: "en" })).toLowerCase();
+      translatedBody.location.cityAr = body.location.city?.toLowerCase();
+      translatedBody.location.cityEn = (await translate(body.location.city, { from: "ar", to: "en" }))?.toLowerCase();
 
       translatedBody.location.addressAr = body.location.address;
       translatedBody.location.addressEn = await translate(body.location.address, { from: "ar", to: "en" });
