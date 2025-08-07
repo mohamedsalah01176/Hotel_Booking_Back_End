@@ -2,26 +2,10 @@ import mongoose from "mongoose";
 
 const schema =new mongoose.Schema({
   reserveDates:[{
-      startDate:{
-        type:Date,
-        required:true,
-        validate: {
-          validator: function (value:Date) {
-            return value >= new Date();
-          },
-          message: "startDate must be in the future or today"
-        }
-      },
-      endDate:{
-        type:Date,
-        required:true,
-        validate: {
-          validator: function (value:Date) {
-            return value >= new Date();
-          },
-          message: "startDate must be in the future or today"
-        }
-      },
+    dates:{
+      type:[Date],
+      required:true,
+    },
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
