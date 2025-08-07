@@ -49,6 +49,5 @@ export const propertySchema=yup.object({
 })
 
 export const DateSchema=yup.object({
-  startDate:yup.date().required("stert date is required"),
-  endDate:yup.date().required("End date is required").min(yup.ref("startDate"), "End date must be the same or after the start date"),
+  dates:yup.array().of(yup.date().required()).required("date is required").min(1, "At least one dates are required"),
 })
