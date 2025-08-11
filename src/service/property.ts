@@ -10,7 +10,7 @@ export class PropertyService{
 
   async handleAllProperties(lang:string){
     try{
-      const properties=await PropertyModel.find({});
+      const properties=await PropertyModel.find({isActive:true});
       // let properties:IProperty[];
       // if(lang === "ar"){
       //   properties=await PropertyModelAr.find({});
