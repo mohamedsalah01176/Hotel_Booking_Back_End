@@ -269,18 +269,44 @@ export default class UserService{
     }
   }
   async handleUpdateUser(userId:string,body:IUpdateBody){
+    let hashPassword="";
     try{
-      let updateUser=await UserModel.findByIdAndUpdate(userId,{$set:body},{new: true});
-      if(!updateUser){
+      let user=await UserModel.findOne({_id:userId});
+      if(!user){
         return{
           status:"fail",
           messageEn:"User Not Found",
           messageAr:"المستخدم ليس موجود"
         }
-      }else{
+      }
+      if(body.oldPassword){
+        const checkedPassword=await bcrypt.compare(body?.oldPassword as string,user?.password as string);
+        console.log(checkedPassword,"lllllllllll")
+        if(!checkedPassword){
+          return{
+            status:"fail",
+            messageEn:"Your Old Password Not The Same your Password",
+            messageAr:"كلمه السر القديمه غير متشابه"
+          }
+        }
+        hashPassword=await bcrypt.hash(body?.newPassword as string,Number(process.env.SALTPASSWORD));
+      }
+      console.log(body,"llllllllllllllllll")
+      body.password=hashPassword;
+      delete body.newPassword
+      delete body.oldPassword
+      const updateUser=await UserModel.updateOne({_id:userId},{$set:body},{new: true})
+      if(updateUser.modifiedCount>0){
         return{
           status:"success",
-          updateUser
+          messageEn:"Your Account Updated",
+          messageAr:"تم تحديث حسابكم"
+        }
+      }else{
+        return{
+          status:"fail",
+          messageEn:"Your Account Not Updated",
+          messageAr:"لم تم تحديث حسابكم"
         }
       }
       

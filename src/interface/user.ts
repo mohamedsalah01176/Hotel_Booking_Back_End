@@ -14,7 +14,9 @@ export interface IUpdateBody{
   name?:string,
   phone?:string,
   email?:string,
-  password?:string,
+  oldPassword?:string,
+  newPassword?:string,
+  password?:string;
   birthDate?:Date,
   _id?:string,
   image?:string,
