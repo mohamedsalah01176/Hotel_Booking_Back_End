@@ -10,6 +10,16 @@ export interface IUserBody{
   phoneVerfy:boolean,
   createdAt:Date
 }
+export interface IUpdateBody{
+  name?:string,
+  phone?:string,
+  email?:string,
+  password?:string,
+  birthDate?:Date,
+  _id?:string,
+  image?:string,
+  phoneVerfy?:boolean,
+}
 export interface ILoginUser{
   emailOrPhone:string, 
   password:string
