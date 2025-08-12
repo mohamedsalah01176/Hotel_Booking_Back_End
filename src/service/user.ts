@@ -1,8 +1,8 @@
-import { ILoginUser, IUserBody } from "../interface/user";
+import { ILoginUser, IUpdateBody, IUserBody } from "../interface/user";
 import bcrypt from "bcrypt"
 import UserModel from "../model/user";
 import { sendMessageSMS, sendMessageWhatsUp } from "../util/sendMessage";
-import { forgetPasswordBodySchema, loginBodySchema, regiterBodySchema } from "../util/yapSchema";
+import {  loginBodySchema, regiterBodySchema } from "../util/yapSchema";
 import { sendEmail } from "../util/sendEmail";
 import jwt from "jsonwebtoken";
 
@@ -240,6 +240,50 @@ export default class UserService{
           messageAr:"تم تحديث كلمه السر",
         }
       }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleGetSpecificUser(userId:string){
+    try{
+      let foundUser=await UserModel.findOne({_id:userId});
+      if(!foundUser){
+        return{
+          status:"fail",
+          messageEn:"User Not Found",
+          messageAr:"المستخدم ليس موجود"
+        }
+      }
+      return{
+        status:"success",
+        user:foundUser
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleUpdateUser(userId:string,body:IUpdateBody){
+    try{
+      let updateUser=await UserModel.findByIdAndUpdate(userId,{$set:body},{new: true});
+      if(!updateUser){
+        return{
+          status:"fail",
+          messageEn:"User Not Found",
+          messageAr:"المستخدم ليس موجود"
+        }
+      }else{
+        return{
+          status:"success",
+          updateUser
+        }
+      }
+      
     }catch(errors){
       return{
         status:"error",
