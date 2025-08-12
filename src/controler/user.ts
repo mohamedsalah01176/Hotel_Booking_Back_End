@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import UserService from "../service/user";
 import { ReponseStatues } from "../util/ResponseStatus";
+import { IUserPayload } from "../interface/user";
 
 
 
@@ -41,6 +42,18 @@ export default class UserControler{
   async resetPassword(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleResetPassword(body);
+    ReponseStatues(responseServer,res)  
+  }
+  async getSpecificUser(req:Request,res:Response){
+    const user=req.user as IUserPayload;
+    let responseServer=await this.userService.handleGetSpecificUser(user?._id as string);
+    ReponseStatues(responseServer,res)  
+  }
+  async updateUser(req:Request,res:Response){
+    const user=req.user as IUserPayload;
+    const body =req.body;
+    const pathImage = req.file?.path; 
+    let responseServer=await this.userService.handleUpdateUser(user?._id as string,{...body,image:pathImage});
     ReponseStatues(responseServer,res)  
   }
 }
