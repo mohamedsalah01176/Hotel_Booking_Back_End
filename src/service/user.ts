@@ -199,7 +199,7 @@ export default class UserService{
           messageAr:"الايميل غير مسجل"
         }
       }
-      await sendEmail(userFounded)
+      await sendEmail(userFounded,"password")
       return{
         status:"success",
         messageEn:"Check your gmail account",
