@@ -11,7 +11,7 @@ const commonQuestionsController=new CommonQuestionsController(commonQuestionsSer
 
 
 
-router.get("/questions",authorizationForManager,(req,res)=>commonQuestionsController.getAllQuestions(req,res))
+router.get("/questions",(req,res)=>commonQuestionsController.getAllQuestions(req,res))
 router.post("/questions",authorizationForManager,(req,res)=>commonQuestionsController.addQuestions(req,res))
 router.patch("/questions/:questionId",authorizationForManager,(req,res)=>commonQuestionsController.updateQuestions(req,res))
 router.delete("/questions/:questionId",authorizationForManager,(req,res)=>commonQuestionsController.deleteQuestions(req,res))
