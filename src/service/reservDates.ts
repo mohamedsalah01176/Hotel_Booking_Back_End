@@ -14,12 +14,12 @@ export default class ReservDatesService{
     // }
     try{
       await DateSchema.validate(body);
-      const property=await PropertyModel.findOne({_id:propertyId}).select(["admin._id", "nightPrice"]);
+      const property=await PropertyModel.findOne({_id:propertyId});
       const foundHotal= await ReserveDateModel.findOne({propertyId:propertyId});
       if(foundHotal){
         await ReserveDateModel.updateOne({_id:foundHotal._id},{$push:{reserveDates:{...body,userId:user._id}}})
       }else{
-        const newReservDate= new ReserveDateModel({reserveDates:{...body,userId:user._id},adminId:property?.admin?._id,propertyId});
+        const newReservDate= new ReserveDateModel({reserveDates:{...body,userId:user._id},adminId:property?.admin?._id,property,propertyId});
         await newReservDate.save()
       }
       return{
@@ -36,21 +36,68 @@ export default class ReservDatesService{
  
   async handleGetReserveDateForProperty(propertyId:string){
     try{
-      const property=await PropertyModel.findOne({_id:propertyId}).select(["admin._id", "nightPrice"]);
       const foundHotal= await ReserveDateModel.findOne({propertyId:propertyId});
       if(foundHotal){
         return{
           status:"success",
           property:foundHotal,
-          nightPrice:property?.nightPrice
+          nightPrice:foundHotal.property?.nightPrice
         }
       }else{
+        const property=await PropertyModel.findOne({_id:propertyId});
         return{
           status:"success",
           message:"You do not have any reserve date",
           nightPrice:property?.nightPrice
         }
       }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleGetReserveDateForUser(userId:string){
+    console.log(userId)
+    try{
+      const foundHotels = await ReserveDateModel.find({ "reserveDates.userId": userId });
+      if (foundHotels.length > 0) {
+      return {
+        status: "success",
+        properties: foundHotels.map(hotel => ({
+          property: hotel.property,
+          nightPrice: hotel.property?.nightPrice,
+          reserveDates: hotel.reserveDates.filter(r => r.userId.toString() === userId)
+        }))
+      };
+    } else {
+      return {
+        status: "success",
+        message: "You do not have any reserve dates"
+      };
+    }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleDeleteRevervedDate(dateId:string){
+    try{
+      const deletedHotel = await ReserveDateModel.updateOne({"reserveDates._id": dateId },{$pull:{reserveDates:{_id:dateId}}});
+    if (deletedHotel.modifiedCount>0) {
+      return {
+        status: "success",
+        message :"Hotal Deleted"
+      };
+    } else {
+      return {
+        status: "success",
+        message: "Not Found This Hotal"
+      };
+    }
     }catch(errors){
       return{
         status:"error",
