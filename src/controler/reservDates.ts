@@ -18,4 +18,14 @@ export default class ReservDatesController{
     const responseServicer= await this.reverveDateService.handleGetReserveDateForProperty(propertyId);
     ReponseStatues(responseServicer,res)
   }
+  async getReserveDateForUser(req:Request,res:Response){
+    const userId=req?.user as IUserPayload;
+    const responseServicer= await this.reverveDateService.handleGetReserveDateForUser(userId._id);
+    ReponseStatues(responseServicer,res)
+  }
+  async deleteRevervedDate(req:Request,res:Response){
+    const dateId=req.params.dateId
+    const responseServicer= await this.reverveDateService.handleDeleteRevervedDate(dateId);
+    ReponseStatues(responseServicer,res)
+  }
 }

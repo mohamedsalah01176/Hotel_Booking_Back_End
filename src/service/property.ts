@@ -98,7 +98,7 @@ export class PropertyService{
         }
       }else{
         return{
-          status:"fail",
+          status:"success",
           message:"This admin have not any properties"
         }
       }

@@ -18,9 +18,13 @@ const schema =new mongoose.Schema({
     required: true
   },
   propertyId:{
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "Property",
+    type:String,
+    required:true
+  },
+  property:{
+    type: Object,
+    // ref: "Property",
+    required: true
   }
 },{
   timestamps: true
