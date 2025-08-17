@@ -25,18 +25,38 @@ export default class UserControler{
   async register(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleRegister(body);
+    if (responseServer.status === "success" && responseServer.token) {
+      res.cookie("token", responseServer.token, {
+        httpOnly: false,
+        secure:true,
+        maxAge: 15 * 24 * 60 * 60 * 1000, // 15 يوم
+        sameSite: "strict",
+      });
+    }
     ReponseStatues(responseServer,res)
   }
   
   async login(req:Request,res:Response){
     const body=req.body;
+    console.log("dddddddddd")
     let responseServer=await this.userService.handleLogin(body);
+    console.log(responseServer)
+    if (responseServer.status === "success" && responseServer.token) {
+      res.cookie("token", responseServer.token, {
+        httpOnly: false,
+        secure: true,
+        maxAge: 15 * 24 * 60 * 60 * 1000, // 15 يوم
+        sameSite: "strict",
+      });
+      console.log("sssssssssssss")
+    }
     ReponseStatues(responseServer,res)  
   }
-
+  
   async forgetPassword(req:Request,res:Response){
     const body=req.body;
     let responseServer=await this.userService.handleForgetPassword(body);
+    
     ReponseStatues(responseServer,res)  
   }
   async resetPassword(req:Request,res:Response){
