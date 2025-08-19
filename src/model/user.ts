@@ -9,6 +9,7 @@ const Schema=new mongoose.Schema({
   phone: {
     type: String,
     required: true,
+    match: [/^\+?[1-9]\d{6,14}$/, 'Invalid email format'],
     unique:true
   },
   role: {
