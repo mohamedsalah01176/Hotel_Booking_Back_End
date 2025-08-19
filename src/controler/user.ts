@@ -30,7 +30,7 @@ export default class UserControler{
         httpOnly: false,
         secure:true,
         maxAge: 15 * 24 * 60 * 60 * 1000, // 15 يوم
-        sameSite: "strict",
+        // sameSite: "strict",
       });
     }
     ReponseStatues(responseServer,res)
@@ -46,7 +46,7 @@ export default class UserControler{
         httpOnly: false,
         secure: true,
         maxAge: 15 * 24 * 60 * 60 * 1000, // 15 يوم
-        sameSite: "strict",
+        // sameSite: "strict",
       });
       console.log("sssssssssssss")
     }
