@@ -84,6 +84,20 @@ export default class ReservDatesService{
       }
     }
   }
+  async handleGetAllReserveDate(){
+    try{
+      const disableDates = await ReserveDateModel.find({});
+      return {
+        status: "success",
+        disableDates:disableDates.map((item)=>item.reserveDates.map((item)=>item))
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
   async handleDeleteRevervedDate(dateId:string){
     try{
       const deletedHotel = await ReserveDateModel.updateOne({"reserveDates._id": dateId },{$pull:{reserveDates:{_id:dateId}}});
