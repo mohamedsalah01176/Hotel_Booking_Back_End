@@ -23,6 +23,10 @@ export default class ReservDatesController{
     const responseServicer= await this.reverveDateService.handleGetReserveDateForUser(userId._id);
     ReponseStatues(responseServicer,res)
   }
+  async getAllReserveDate(req:Request,res:Response){
+    const responseServicer= await this.reverveDateService.handleGetAllReserveDate();
+    ReponseStatues(responseServicer,res)
+  }
   async deleteRevervedDate(req:Request,res:Response){
     const dateId=req.params.dateId
     const responseServicer= await this.reverveDateService.handleDeleteRevervedDate(dateId);

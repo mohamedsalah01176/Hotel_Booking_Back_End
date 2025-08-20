@@ -13,6 +13,7 @@ const reservController=new ReservDatesController(resvervService)
 router.post("/reserve/:propertyId",authentication,(req,res)=>reservController.revesveDates(req,res))
 router.get("/reserve/:propertyId",authentication,(req,res)=>reservController.getReserveDateForProperty(req,res))
 router.get("/reservedDates",authentication,(req,res)=>reservController.getReserveDateForUser(req,res))
+router.get("/allReservedDates",authentication,(req,res)=>reservController.getAllReserveDate(req,res))
 router.delete("/reservedDates/:dateId",authentication,(req,res)=>reservController.deleteRevervedDate(req,res))
 
 
