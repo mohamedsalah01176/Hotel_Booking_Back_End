@@ -89,7 +89,10 @@ export default class ReservDatesService{
       const disableDates = await ReserveDateModel.find({});
       return {
         status: "success",
-        disableDates:disableDates.map((item)=>item.reserveDates.map((item)=>item))
+        disableDates:disableDates.map((item) => ({
+        propertyId: item.propertyId,
+        disableDates: item.reserveDates
+      }))
       }
     }catch(errors){
       return{
