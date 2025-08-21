@@ -46,7 +46,23 @@ app.use(helmet({
         action:"deny"
     }
 }))
-app.use(cors({origin: "http://localhost:5173",credentials: true}));
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://hotel-booking-front-end-x8sw.vercel.app"
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); 
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'CORS policy does not allow access from this origin';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 
 app.use(compression());
 
