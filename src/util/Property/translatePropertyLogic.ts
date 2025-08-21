@@ -5,11 +5,12 @@ import CityModel from "../../model/city";
 import PropertyModel from "../../model/property";
 import { translateToAr } from "./translateToAr";
 import { translateToEn } from "./translateToEn";
+import { dangerousPlaces } from '../dangerousPlace';
 
 export const translateToEnLogic =async (body:IProperty,adminBody?:IUserPayload)=>{
-    const translatedBody= await translateToEn(body);
-
-  const newProperty=new PropertyModel({...translatedBody,admin:adminBody});
+  const translatedBody= await translateToEn(body);
+  const isDangerousPlace= dangerousPlaces.some(item=>item.toLowerCase() ===body.location.cityEn?.toLowerCase())
+  const newProperty=new PropertyModel({...translatedBody,admin:adminBody,isDangerousPlace});
   await newProperty.save();
   const cityUpdated=await CityModel.updateOne({nameAr:translatedBody.location.city.toLowerCase()},{$inc:{numberOfHotel:1}});
   if(cityUpdated.modifiedCount ===0){
@@ -23,7 +24,10 @@ export const translateToEnLogic =async (body:IProperty,adminBody?:IUserPayload)=
 }
 export const translateToArLogic =async (body:IProperty,adminBody:IUserPayload)=>{
   const translatedBody= await translateToAr(body);
-  const newProperty=new PropertyModel({...translatedBody,admin:adminBody});
+  const isDangerousPlace= dangerousPlaces.some(item=>item.toLowerCase() ===body.location.city?.toLowerCase())
+  console.log(body.location.city,"city")
+  console.log(isDangerousPlace)
+  const newProperty=new PropertyModel({...translatedBody,admin:adminBody,isDangerousPlace});
   await newProperty.save();
   const cityUpdated=await CityModel.updateOne({nameEn:translatedBody.location.city.toLowerCase()},{$inc:{numberOfHotel:1}})
   if(cityUpdated.modifiedCount ===0){

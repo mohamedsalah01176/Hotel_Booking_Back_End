@@ -78,4 +78,5 @@ export interface IProperty {
       lng: number;
     };
   };
+  isDangerousPlace:boolean
 }
