@@ -124,7 +124,12 @@ const propertySchema = new mongoose.Schema({
   isDangerousPlace:{
     type:Boolean,
     required:true
-  }
+  },
+  isConfirmed:{
+    type:Boolean,
+    required:true
+  },
+  
 });
 
 
