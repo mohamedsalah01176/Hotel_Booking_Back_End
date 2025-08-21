@@ -17,6 +17,7 @@ export class PropertyService{
       // }else{
       //   properties=await PropertyModelEn.find({});
       // }
+      console.log(properties)
       return{
         status:"success",
         properties
@@ -72,8 +73,9 @@ export class PropertyService{
       }
       return{
         status:"success",
-        message:"Property Added"
+        message: "Your property has been submitted and is waiting for manager review."
       }
+      
     }catch(errors){
       return{
         status:"error",
