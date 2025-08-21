@@ -7,10 +7,17 @@ import { translateToAr } from "./translateToAr";
 import { translateToEn } from "./translateToEn";
 import { dangerousPlaces } from '../dangerousPlace';
 
-export const translateToEnLogic =async (body:IProperty,adminBody?:IUserPayload)=>{
+export const translateToEnLogic =async (body:IProperty,adminBody:IUserPayload)=>{
   const translatedBody= await translateToEn(body);
   const isDangerousPlace= dangerousPlaces.some(item=>item.toLowerCase() ===body.location.cityEn?.toLowerCase())
-  const newProperty=new PropertyModel({...translatedBody,admin:adminBody,isDangerousPlace});
+  const foundProperty= await PropertyModel.findOne({"admin._id":adminBody?._id})
+  let newProperty;
+  if(foundProperty && foundProperty.isConfirmed === true){
+    newProperty=new PropertyModel({...translatedBody,admin:adminBody,isDangerousPlace,isConfirmed:true});
+  }else{
+    newProperty=new PropertyModel({...translatedBody,admin:adminBody,isActive:false,isDangerousPlace,isConfirmed:false});
+    
+  }
   await newProperty.save();
   const cityUpdated=await CityModel.updateOne({nameAr:translatedBody.location.city.toLowerCase()},{$inc:{numberOfHotel:1}});
   if(cityUpdated.modifiedCount ===0){
@@ -25,9 +32,14 @@ export const translateToEnLogic =async (body:IProperty,adminBody?:IUserPayload)=
 export const translateToArLogic =async (body:IProperty,adminBody:IUserPayload)=>{
   const translatedBody= await translateToAr(body);
   const isDangerousPlace= dangerousPlaces.some(item=>item.toLowerCase() ===body.location.city?.toLowerCase())
-  console.log(body.location.city,"city")
-  console.log(isDangerousPlace)
-  const newProperty=new PropertyModel({...translatedBody,admin:adminBody,isDangerousPlace});
+  const foundProperty= await PropertyModel.findOne({"admin._id":adminBody?._id})
+  let newProperty;
+  if(foundProperty && foundProperty.isConfirmed === true){
+    newProperty=new PropertyModel({...translatedBody,admin:adminBody,isDangerousPlace,isConfirmed:true});
+  }else{
+    newProperty=new PropertyModel({...translatedBody,admin:adminBody,isActive:false,isDangerousPlace,isConfirmed:false});
+    
+  }
   await newProperty.save();
   const cityUpdated=await CityModel.updateOne({nameEn:translatedBody.location.city.toLowerCase()},{$inc:{numberOfHotel:1}})
   if(cityUpdated.modifiedCount ===0){
