@@ -120,6 +120,10 @@ const propertySchema = new mongoose.Schema({
       lat: { type: Number, required: true },
       lng: { type: Number, required: true }
     }
+  },
+  isDangerousPlace:{
+    type:Boolean,
+    required:true
   }
 });
 
