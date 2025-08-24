@@ -133,7 +133,7 @@ export default class UserService{
     try{
       let validateBody=await loginBodySchema.validate(body,{abortEarly:false});
       let foundUser:IUserBody | null;
-      if(validateBody.emailOrPhone.startsWith("+2")){
+      if(validateBody.emailOrPhone.startsWith("+")){
         foundUser=await UserModel.findOne({phone:validateBody.emailOrPhone});
       }else{
         foundUser=await UserModel.findOne({email:validateBody.emailOrPhone});
