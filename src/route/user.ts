@@ -1,7 +1,7 @@
 import {  Router } from "express";
 import UserService from "../service/user";
 import UserControler from "../controler/user";
-import { authentication } from "../meddileware/user";
+import { authentication, authorizationForManager } from "../meddileware/user";
 import upload from "../meddileware/cloudnary";
 
 const router=Router();
@@ -18,6 +18,8 @@ router.post("/forgetPassword",(req,res)=>userControler.forgetPassword(req,res))
 router.post("/resetPassword",(req,res)=>userControler.resetPassword(req,res))
 router.get("/setting",authentication,(req,res)=>userControler.getSpecificUser(req,res))
 router.patch("/setting",authentication,upload.single("image"),(req,res)=>userControler.updateUser(req,res))
+router.get("/users",authorizationForManager,(req,res)=>userControler.getAllUsers(req,res))
+router.delete("/users/:userId",authorizationForManager,(req,res)=>userControler.deleteUser(req,res))
 
 
 

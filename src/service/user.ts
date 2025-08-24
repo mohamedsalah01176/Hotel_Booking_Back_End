@@ -317,4 +317,43 @@ export default class UserService{
       }
     }
   }
+  async handleGetAllUsers(){
+    try{
+      const users=await UserModel.find({});
+      return{
+          status:"success",
+          users
+        }
+    }catch(errors){
+      console.log(errors)
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleDeleteUser(userId:string){
+
+    try{
+      const userDeleted=await UserModel.deleteOne({_id:userId});
+      if(userDeleted.deletedCount>0){
+        return{
+          status:"success",
+          userDeleted
+        }
+      }else{
+        return{
+          status:"fail",
+          messageEn:"User Not Found",
+          messageAr:"المستخدم ليس موجود"
+        }
+      }
+    }catch(errors){
+      console.log(errors)
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
 }

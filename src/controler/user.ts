@@ -57,4 +57,13 @@ export default class UserControler{
     let responseServer=await this.userService.handleUpdateUser(user?._id as string,{...body,image:pathImage});
     ReponseStatues(responseServer,res)  
   }
+  async getAllUsers(req:Request,res:Response){
+    let responseServer=await this.userService.handleGetAllUsers();
+    ReponseStatues(responseServer,res)  
+  }
+  async deleteUser(req:Request,res:Response){
+    const userId=req.params.userId;
+    let responseServer=await this.userService.handleDeleteUser(userId);
+    ReponseStatues(responseServer,res)  
+  }
 }
