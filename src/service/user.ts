@@ -5,6 +5,7 @@ import { sendMessageSMS, sendMessageWhatsUp } from "../util/sendMessage";
 import {  loginBodySchema, regiterBodySchema } from "../util/yapSchema";
 import { sendEmail } from "../util/sendEmail";
 import jwt from "jsonwebtoken";
+import PropertyModel from "../model/property";
 
 
 
@@ -337,6 +338,7 @@ export default class UserService{
     try{
       const userDeleted=await UserModel.deleteOne({_id:userId});
       if(userDeleted.deletedCount>0){
+        await PropertyModel.deleteMany({"admin._id":userId})
         return{
           status:"success",
           userDeleted

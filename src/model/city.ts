@@ -17,6 +17,10 @@ const schema =new mongoose.Schema({
     type:Number,
     default:0,
   },
+  isDangerousPlace:{
+    type:Boolean,
+    required:true
+  },
 });
 
 const CityModel=mongoose.model("city",schema);
