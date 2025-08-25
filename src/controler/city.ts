@@ -9,4 +9,15 @@ export default class CityController{
     let responseServer= await this.cityService.handleGetCities()
     ReponseStatues(responseServer,res)
   }
+  async deleteCity(req:Request,res:Response){
+    const cityName=req.params.cityName
+    let responseServer= await this.cityService.handleDeleteCities(cityName)
+    ReponseStatues(responseServer,res)
+  }
+  async updateCity(req:Request,res:Response){
+    const cityName=req.params.cityName;
+    const body=req.body;
+    let responseServer= await this.cityService.handleUpdateCities(cityName,body)
+    ReponseStatues(responseServer,res)
+  }
 }

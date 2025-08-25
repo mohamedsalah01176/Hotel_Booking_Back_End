@@ -25,6 +25,7 @@ export const translateToEnLogic =async (body:IProperty,adminBody:IUserPayload)=>
       name:translatedBody.location.city,
       nameAr:translatedBody.location.cityAr,
       nameEn:translatedBody.location.cityEn,
+      isDangerousPlace,
       numberOfHotel:1
     })
   }
@@ -47,6 +48,7 @@ export const translateToArLogic =async (body:IProperty,adminBody:IUserPayload)=>
       name:translatedBody.location.city,
       nameEn:translatedBody.location.cityEn,
       nameAr:translatedBody.location.cityAr,
+      isDangerousPlace,
       numberOfHotel:1
     })
   }
