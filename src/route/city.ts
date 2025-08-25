@@ -10,6 +10,8 @@ const cityService=new CityService();
 const cityController=new CityController(cityService);
 
 router.get("/city",(req,res)=>cityController.allCities(req,res))
+router.delete("/city/:cityName",(req,res)=>cityController.deleteCity(req,res))
+router.patch("/city/:cityName",(req,res)=>cityController.updateCity(req,res))
 
 
 
