@@ -11,6 +11,11 @@ export default class PropertyController{
     let responseServer= await this.propertyService.handleAllProperties(lang)
     ReponseStatues(responseServer,res);
   }
+  async allActiveProperty(req:Request,res:Response){
+    const lang =req.query.lang as string | "en"
+    let responseServer= await this.propertyService.handleAllActiveProperties(lang)
+    ReponseStatues(responseServer,res);
+  }
   async specificProperty(req:Request,res:Response){
     const lang =req.query.lang as string | "en"
     let propertyId:string=req.params.propertyId
@@ -51,6 +56,17 @@ export default class PropertyController{
     const user=req.user as IUserBody;
     const propertyId=req.params.propertyId;
     let responseServer= await this.propertyService.handleActiveProperty(user,propertyId)
+    ReponseStatues(responseServer,res);
+  }
+  async confirmProperty(req:Request,res:Response){
+    const propertyId=req.params.propertyId;
+    let responseServer= await this.propertyService.handleConfirmProperty(propertyId)
+    ReponseStatues(responseServer,res);
+  }
+  async deleteProperty(req:Request,res:Response){
+    const user=req.user as IUserBody;
+    const propertyId=req.params.propertyId;
+    let responseServer= await this.propertyService.handleDeleteProperty(propertyId)
     ReponseStatues(responseServer,res);
   }
 }
