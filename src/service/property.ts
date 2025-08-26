@@ -1,5 +1,6 @@
 import { IProperty } from "../interface/property";
 import {  IUserPayload } from "../interface/user";
+import CityModel from "../model/city";
 import PropertyModel from "../model/property";
 import { translateToArLogic, translateToEnLogic } from "../util/Property/translatePropertyLogic";
 import { translateToAr } from "../util/Property/translateToAr";
@@ -9,6 +10,27 @@ import { propertySchema } from "../util/yapSchema";
 export class PropertyService{
 
   async handleAllProperties(lang:string){
+    try{
+      const properties=await PropertyModel.find({});
+      // let properties:IProperty[];
+      // if(lang === "ar"){
+      //   properties=await PropertyModelAr.find({});
+      // }else{
+      //   properties=await PropertyModelEn.find({});
+      // }
+      console.log(properties)
+      return{
+        status:"success",
+        properties
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleAllActiveProperties(lang:string){
     try{
       const properties=await PropertyModel.find({isActive:true});
       // let properties:IProperty[];
@@ -198,6 +220,50 @@ export class PropertyService{
         message:"Property is Active"
       }
     }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleConfirmProperty(propertyId:string){
+    try{
+      const foundProperty=await PropertyModel.findOne({_id:propertyId});
+      if(!foundProperty){
+        return{
+          status:"fail",
+          message:"This Property is not found"
+        }
+      }
+      foundProperty.set({isConfirmed:true});
+      foundProperty.save()
+      return{
+        status:"success",
+        message:"Property is confirmed"
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleDeleteProperty(propertyId:string){
+    try {
+    const deletedProperty = await PropertyModel.findByIdAndDelete(propertyId);
+
+    if (!deletedProperty) {
+      return {
+        status: "fail",
+        message: "This property was not found"
+      };
+    }
+    await CityModel.updateOne({nameEn:deletedProperty.location.cityEn},{$inc:{numberOfHotel:-1}})
+    return {
+      status: "success",
+      message: "Property has been deleted"
+    };
+  }catch(errors){
       return{
         status:"error",
         errors
