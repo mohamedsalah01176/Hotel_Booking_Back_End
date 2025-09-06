@@ -79,5 +79,6 @@ export interface IProperty {
     };
   };
   isDangerousPlace:boolean
-  isConfirmed:boolean
+  isConfirmed:boolean,
+  createdAt:Date
 }

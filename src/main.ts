@@ -11,6 +11,7 @@ import cityRouter from "./route/city";
 import reviewRouter from "./route/review";
 import reservRouter from "./route/reservDates";
 import CommonQuestionsRouter from "./route/commonQuestions";
+import dashboardRouter from "./route/dashboard";
 
 
 
@@ -73,6 +74,7 @@ app.use("/api",cityRouter)
 app.use("/api",reviewRouter)
 app.use("/api",reservRouter)
 app.use("/api",CommonQuestionsRouter)
+app.use("/api",dashboardRouter)
 
 app.get('/', (_req, res) => {
   res.send('API is working 🎉');

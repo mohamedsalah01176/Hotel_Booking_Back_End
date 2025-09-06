@@ -6,11 +6,15 @@ const schema =new mongoose.Schema({
       type:[Date],
       required:true,
     },
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-      },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    createdAt:{
+      type:Date,
+      default:Date.now
+    }
   }],
   adminId: {
     type: mongoose.Schema.Types.ObjectId,
