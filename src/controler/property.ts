@@ -7,13 +7,20 @@ export default class PropertyController{
   constructor(private propertyService:PropertyService){}
 
   async allProperty(req:Request,res:Response){
-    const lang =req.query.lang as string | "en"
-    let responseServer= await this.propertyService.handleAllProperties(lang)
+    let responseServer= await this.propertyService.handleAllProperties()
     ReponseStatues(responseServer,res);
   }
+  
   async allActiveProperty(req:Request,res:Response){
-    const lang =req.query.lang as string | "en"
-    let responseServer= await this.propertyService.handleAllActiveProperties(lang)
+    const limit=req.query.limit;
+    let responseServer= await this.propertyService.handleAllActiveProperties(Number(limit))
+    ReponseStatues(responseServer,res);
+  }
+  async allActivePropertiesForCity(req:Request,res:Response){
+    const cityEn =req.params.cityEn
+    const pageNumber=req.query.pageNumber;
+    const limit=req.query.limit;
+    let responseServer= await this.propertyService.handleAllActivePropertiesForCity(cityEn,Number(pageNumber),Number(limit))
     ReponseStatues(responseServer,res);
   }
   async specificProperty(req:Request,res:Response){

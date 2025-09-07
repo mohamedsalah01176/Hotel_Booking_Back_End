@@ -10,6 +10,7 @@ const dashboardController=new DashboardController(dashboardService);
 
 router.get("/dashboard",authorizationForManager,(req,res)=>dashboardController.analysisData(req,res))
 router.get("/chart",authorizationForManager,(req,res)=>dashboardController.getChartData(req,res))
+router.get("/topProperty",authorizationForManager,(req,res)=>dashboardController.getTopProperty(req,res))
 
 
 

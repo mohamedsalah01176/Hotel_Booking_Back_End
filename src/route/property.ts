@@ -12,6 +12,7 @@ const propertyController=new PropertyController(propertyService);
 router.get("/property",(req,res)=>propertyController.allProperty(req,res))
 router.delete("/property/:propertyId",authentication,(req,res)=>propertyController.deleteProperty(req,res))
 router.get("/activeProperty",(req,res)=>propertyController.allActiveProperty(req,res))
+router.get("/activePropertyForCity/:cityEn",(req,res)=>propertyController.allActivePropertiesForCity(req,res))
 router.get("/property/:propertyId",(req,res)=>propertyController.specificProperty(req,res))
 router.post("/property",authentication,upload.array("images",30),(req,res)=>propertyController.addProperty(req,res))
 router.patch("/property/:propertyId",authentication,upload.array("images",30),(req,res)=>propertyController.updateProperty(req,res))

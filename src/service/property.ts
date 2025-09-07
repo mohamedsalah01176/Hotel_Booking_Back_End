@@ -9,15 +9,9 @@ import { propertySchema } from "../util/yapSchema";
 
 export class PropertyService{
 
-  async handleAllProperties(lang:string){
+  async handleAllProperties(){
     try{
       const properties=await PropertyModel.find({});
-      // let properties:IProperty[];
-      // if(lang === "ar"){
-      //   properties=await PropertyModelAr.find({});
-      // }else{
-      //   properties=await PropertyModelEn.find({});
-      // }
       console.log(properties)
       return{
         status:"success",
@@ -30,19 +24,33 @@ export class PropertyService{
       }
     }
   }
-  async handleAllActiveProperties(lang:string){
+  async handleAllActiveProperties(limit:number){
     try{
-      const properties=await PropertyModel.find({isActive:true});
-      // let properties:IProperty[];
-      // if(lang === "ar"){
-      //   properties=await PropertyModelAr.find({});
-      // }else{
-      //   properties=await PropertyModelEn.find({});
-      // }
+      const properties=await PropertyModel.find({isActive:true}).sort({ordersNumbers:-1}).limit(limit);
       console.log(properties)
       return{
         status:"success",
         properties
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleAllActivePropertiesForCity(cityEn:string,pageNumber:number,limit:number){
+    console.log(limit)
+    console.log(pageNumber)
+    const skip=(pageNumber-1)*limit || 0;
+    console.log(cityEn)
+    try{
+      const allproperties=await PropertyModel.find({isActive:true,"location.cityEn":cityEn.toLowerCase()});
+      const properties=await PropertyModel.find({isActive:true,"location.cityEn":cityEn.toLowerCase()}).sort({ordersNumbers:-1}).skip(skip).limit(limit);
+      return{
+        status:"success",
+        properties,
+        numberOfProperties:allproperties.length
       }
     }catch(errors){
       return{

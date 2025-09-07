@@ -10,6 +10,7 @@ export default class CommonQuestionsServices{
   async handleAllQuestions(){
     try{
       const questions= await QuestionsModel.find({});
+      console.log(questions)
       return{
         status:"success",
         questions
@@ -25,13 +26,6 @@ export default class CommonQuestionsServices{
     try{
       const translator = lang === "ar" ? translateToEn : translateToAr;
       const translated = await translator(body as IQuestionBody);
-      const foundQuestion= await QuestionsModel.findOne({questionAr:body.question});
-      if(foundQuestion){
-        return{
-          status:"fail",
-          message:"هذا السؤال موجود بلفعل"
-        }
-      }
       const newQuestion = new QuestionsModel(translated);
       await newQuestion.save();
       return{

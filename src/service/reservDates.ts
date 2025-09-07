@@ -22,6 +22,7 @@ export default class ReservDatesService{
         const newReservDate= new ReserveDateModel({reserveDates:{...body,userId:user._id},adminId:property?.admin?._id,property,propertyId});
         await newReservDate.save()
       }
+      await PropertyModel?.updateOne({ _id: propertyId },{$inc:{ordersNumbers:1}})
       return{
         status:"success",
         message:"Date reserved successfully"
