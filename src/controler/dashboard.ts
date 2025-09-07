@@ -13,4 +13,8 @@ export default class DashboardController{
     let responseServer= await this.dashboardService.handleGetChartData()
     ReponseStatues(responseServer,res)
   }
+  async getTopProperty(req:Request,res:Response){
+    let responseServer= await this.dashboardService.handleGetTopProperty()
+    ReponseStatues(responseServer,res)
+  }
 }
