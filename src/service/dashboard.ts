@@ -1,23 +1,29 @@
 import PropertyModel from "../model/property";
 import { ReserveDateModel } from "../model/ReservDates";
 import UserModel from "../model/user";
-import { getCounts } from "../util/getCoutDashboard";
+import { getCountsByDay, getCountsByMonth } from "../util/getCoutDashboard";
 import { groupByMonth } from "../util/groupByMonth";
 
 export default class DashboardService {
   async handleGetAnalysisData() {
     try {
+      const reserveDatesMonthly = await getCountsByMonth(ReserveDateModel, "reserveDates");
+      const propertiesMonthly = await getCountsByMonth(PropertyModel);
+      const usersMonthly = await getCountsByMonth(UserModel);
 
-      const reserveDates = await getCounts(ReserveDateModel, "reserveDates");
-      const properties = await getCounts(PropertyModel);
-      const users = await getCounts(UserModel);
+      const reserveDatesDay = await getCountsByDay(ReserveDateModel, "reserveDates");
+      const propertiesDay = await getCountsByDay(PropertyModel);
+      const usersDay = await getCountsByDay(UserModel);
 
       return {
         status: "success",
         data: {
-          reserveDates,
-          properties,
-          users,
+          reserveDatesMonthly,
+          propertiesMonthly,
+          usersMonthly,
+          reserveDatesDay,
+          propertiesDay,
+          usersDay,
         },
       };
     } catch (errors) {
@@ -65,6 +71,23 @@ export default class DashboardService {
         status: "success",
         data: {
           result
+        },
+      };
+    } catch (errors) {
+        return {
+          status: "error",
+          errors,
+        };
+      }
+    }
+    
+    async handleGetTopProperty(){
+    try{
+      const topProperty=await PropertyModel.find({}).sort({ ordersNumbers: -1 }).limit(10);
+      return {
+        status: "success",
+        data: {
+          topProperty
         },
       };
     } catch (errors) {
