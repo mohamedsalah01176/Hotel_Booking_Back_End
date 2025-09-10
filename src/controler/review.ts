@@ -7,15 +7,29 @@ export default class ReviewController{
   constructor(private reviewServices:ReviewServices){}
 
   async addReview(req:Request,res:Response){
-
     const body=req.body;
     const lang=req.query.lang as string;
     const propertyId=req.params.propertyId
     const user=req.user as IUserBody;
-    console.log(user,"dddddddddddddddd");
-    console.log(lang,"dddddddddddddddd");
-
+    
     let responseServer=await this.reviewServices.handleAddReview(body,user,propertyId,lang);
+    ReponseStatues(responseServer,res)
+  }
+  
+  async deleteReview(req:Request,res:Response){
+    const reviewId=req.params.reviewId;
+    const user=req.user as IUserBody;
+    
+    let responseServer=await this.reviewServices.handleDeleteReview(user,reviewId);
+    ReponseStatues(responseServer,res)
+  }
+  
+  async updateReview(req:Request,res:Response){
+    const reviewId=req.params.reviewId;
+    const user=req.user as IUserBody;
+    const body=req.body;
+    const lang=req.query.lang as string;
+    let responseServer=await this.reviewServices.handleUpdateReview(user,reviewId,body,lang);
     ReponseStatues(responseServer,res)
   }
 }

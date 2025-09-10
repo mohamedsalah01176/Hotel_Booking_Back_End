@@ -31,6 +31,8 @@ export const getCountsByMonth = async (Model: any, path?: string) => {
         if (item.createdAt >= startOfLastMonth && item.createdAt <= endOfLastMonth) previousCount++;
       });
     });
+    console.log(currentCount);
+    console.log(previousCount);
   } else {
     currentCount = await Model.countDocuments({ createdAt: { $gte: startOfThisMonth } });
     previousCount = await Model.countDocuments({
@@ -42,7 +44,7 @@ export const getCountsByMonth = async (Model: any, path?: string) => {
   if (previousCount > 0) {
     percentageChange = ((currentCount - previousCount) / previousCount) * 100;
   } else if (previousCount === 0 && currentCount > 0) {
-    percentageChange = 0;
+    percentageChange = 100;
   }
 
   return {
@@ -96,10 +98,11 @@ export const getCountsByDay = async (Model: any, path?: string) => {
   }
 
   let percentageChange = 0;
+
   if (previousCount > 0) {
     percentageChange = ((currentCount - previousCount) / previousCount) * 100;
   } else if (previousCount === 0 && currentCount > 0) {
-    percentageChange = 0;
+    percentageChange = 100;
   }
 
   return {

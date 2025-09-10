@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import { IProperty } from "../interface/property";
 
 const reviewSchema = new mongoose.Schema({
-  _id:{type: mongoose.Schema.Types.ObjectId},
   user: { 
+    _id:{type: mongoose.Schema.Types.ObjectId},
     name:{
       type:String
     },
@@ -16,11 +16,15 @@ const reviewSchema = new mongoose.Schema({
     email:{
       type:String
     },
+    createdAt:{
+      type:Date,
+      required:true
+    }
   },
   data: { type: String},
   dataEn: { type: String},
   dataAr: { type: String},
-  rating: { type: Number, min: 1, max: 5 },
+  rate: { type: Number, min: 1, max: 5 },
 },{timestamps:true});
 
 const adminSchema = new mongoose.Schema({
@@ -95,6 +99,47 @@ const propertySchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1
+  },
+  electricityAndWater:{
+    type:Object,
+    required:true,
+    solar:{
+      type:Number,
+      required:true,
+      min:0,
+      max:24
+    },
+    stateElectricity:{
+      type:Number,
+      required:true,
+      min:0,
+      max:24
+    },
+    amperes:{
+      type:Number,
+      required:true,
+      min:0,
+      max:24
+    },
+    publicWater:{
+      type:Number,
+      required:true,
+      min:0,
+      max:24
+    },
+    privateWell:{
+      type:Number,
+      required:true,
+      min:0,
+      max:24
+    },
+    waterTank:{
+      type: Number,
+      required:true,
+      min:0,
+      max:24
+    },
+    
   },
   services:[{
     service:{type:String},
