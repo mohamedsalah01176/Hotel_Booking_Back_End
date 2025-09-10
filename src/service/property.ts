@@ -1,5 +1,5 @@
-import { IProperty } from "../interface/property";
-import {  IUserPayload } from "../interface/user";
+import { IProperty, IReview } from "../interface/property";
+import {  IUserBody, IUserPayload } from "../interface/user";
 import CityModel from "../model/city";
 import PropertyModel from "../model/property";
 import { translateToArLogic, translateToEnLogic } from "../util/Property/translatePropertyLogic";
@@ -61,17 +61,19 @@ export class PropertyService{
   }
   async handleSpecificProperty(propertyId:string,lang:string){
     try{
-      const property=await PropertyModel.findOne({_id:propertyId});
-      // let property;
-      // if(lang === "ar"){
-      //   property=await PropertyModelAr.findOne({_id:propertyId});
-      // }else{
-      //   property=await PropertyModelEn.findOne({_id:propertyId});
-      // }
+      const property=await PropertyModel.findOne({_id:propertyId}).lean();
+      const properties=await PropertyModel.find({"admin._id":property?.admin?._id}).lean();
+      let lengthOfAllReviews=properties.reduce((acc,item)=>acc+ item.reviews.length,0);
+      let totalRating = properties.reduce(
+        (acc, item) => acc + (item.reviews?.reduce((acc2, review) => acc2 + (review.rate || 0), 0) || 0),
+        0
+      );      
+      const rotalRatingPercentage = lengthOfAllReviews > 0 ? totalRating / lengthOfAllReviews : 0;;
+      console.log(rotalRatingPercentage)
       if(property){
         return{
           status:"success",
-          property
+          property:{...property,allReviews:lengthOfAllReviews,rotalRatingPercentage}
         }
       }else{
         return{
@@ -94,7 +96,13 @@ export class PropertyService{
       };
     }
     try{
-      console.log(body)
+      body.electricityAndWater.solar = Number(body.electricityAndWater.solar);
+      body.electricityAndWater.stateElectricity = Number(body.electricityAndWater.stateElectricity);  
+      body.electricityAndWater.amperes = Number(body.electricityAndWater.amperes);  
+      body.electricityAndWater.publicWater = Number(body.electricityAndWater.publicWater);  
+      body.electricityAndWater.privateWell = Number(body.electricityAndWater.privateWell);  
+      body.electricityAndWater.waterTank = Number(body.electricityAndWater.waterTank);  
+      console.log(body);
       const validbody=await propertySchema.validate(body,{abortEarly:false});
       if(lang === "ar"){
         await translateToEnLogic(body,adminBody)
@@ -278,4 +286,27 @@ export class PropertyService{
       }
     }
   }
+  // async handleGetAllReviewsForHost(user:IUserBody){
+  //   try{
+  //     const properties=await PropertyModel.find({"admin.id":user._id});
+  //     let lengthOfAllreviews=0;
+  //     properties.forEach((item:IProperty)=>lengthOfAllreviews+=item.reviews.length)
+  //     if(propertyUpdated.modifiedCount>0){
+  //       return{
+  //         status:"success",
+  //         message:"Review Updated"
+  //       }
+  //     }else{
+  //       return{
+  //         status:"fail",
+  //         message:"Not Found Any Property"
+  //       }
+  //     }
+  //   }catch(errors){
+  //     return{
+  //       status:"error",
+  //       errors
+  //     }
+  //   }
+  // }
 }
