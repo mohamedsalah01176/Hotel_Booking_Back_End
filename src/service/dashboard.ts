@@ -45,7 +45,6 @@ export default class DashboardService {
       const users = await UserModel.find({
         createdAt: { $gte: startOfYear },
       });
-      console.log(reservations)
 
       const reservationsMonthly = groupByMonth(reservations,"reserveDates");
       const usersMonthly = groupByMonth(users,"users");

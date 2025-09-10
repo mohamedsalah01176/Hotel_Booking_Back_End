@@ -7,11 +7,12 @@ export interface IReview {
     image: string;
     role: string;
     email: string;
+    createdAt:Date
   };
   data: string;
   dataEn: string;
   dataAr: string;
-  rating: number;
+  rate: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -19,7 +20,7 @@ export interface IReviewBody {
   data: string;
   dataAr?: string;
   dataEn?: string;
-  rating: number;
+  rate: number;
 }
 
 export interface IAdmin {
@@ -60,6 +61,14 @@ export interface IProperty {
   badroomNumber: number;
   bedNumber: number;
   isActive: boolean;
+  electricityAndWater:{
+    solar:number,
+    stateElectricity:number,
+    amperes:number,
+    publicWater:number,
+    privateWell:number,
+    waterTank:number,
+  },
   services: {
     service: string;
     serviceEn?: string;

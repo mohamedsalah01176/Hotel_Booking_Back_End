@@ -9,21 +9,80 @@ export default class ReviewServices{
 
 
   async handleAddReview(body:IReviewBody,user:IUserBody,propertyId:string,lang:string){
-    console.log(user)
     try{
       let propertyUpdated : UpdateResult ;
       if(lang === "en"){
         console.log(lang)
         const translaedBody=await translateToAr(body)
-        propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{_id:propertyId,...translaedBody,user:user}}});
+        propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{...translaedBody,user:user}}});
       }else{
         const translaedBody=await translateToEn(body)
-        propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{_id:propertyId,...translaedBody,user}}});
+        propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{...translaedBody,user}}});
       }
       if(propertyUpdated.modifiedCount>0){
         return{
           status:"success",
           message:"Review Added"
+        }
+      }else{
+        return{
+          status:"fail",
+          message:"Not Found Any Property"
+        }
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  
+  async handleDeleteReview(user:IUserBody,reviewId:string){
+    try{
+      let propertyUpdated;
+      if(user.role === "manager"){
+        propertyUpdated=await PropertyModel.updateOne({"reviews._id":reviewId},{$pull:{reviews:{_id:reviewId}}});
+      }else{
+        propertyUpdated=await PropertyModel.updateOne({"reviews._id":reviewId,"reviews.user._id":user._id},{$pull:{reviews:{_id:reviewId}}});
+      }
+      
+      if(propertyUpdated.modifiedCount>0){
+        return{
+          status:"success",
+          message:"Review Deleted"
+        }
+      }else{
+        return{
+          status:"fail",
+          message:"Not Found Any Property"
+        }
+      }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleUpdateReview(user:IUserBody,reviewId:string,body:IReviewBody,lang:string){
+    try{
+      const filter=user.role === "manager"? { "reviews._id": reviewId } : { "reviews._id": reviewId, "reviews.user._id": user._id };
+      const translateBody= lang === "en"?await translateToAr(body): await translateToEn(body)
+      let propertyUpdated =await PropertyModel.updateOne(filter,{
+        $set:{
+          "reviews.$.data": translateBody.data,
+          "reviews.$.dataEn": translateBody.dataEn,
+          "reviews.$.dataAr": translateBody.dataAr,
+          "reviews.$.rate": translateBody.rate,
+          }
+      }) ;
+      
+      
+      if(propertyUpdated.modifiedCount>0){
+        return{
+          status:"success",
+          message:"Review Updated"
         }
       }else{
         return{
