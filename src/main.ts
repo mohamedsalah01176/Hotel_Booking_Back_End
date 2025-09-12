@@ -50,7 +50,8 @@ app.use(helmet({
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://hotel-booking-front-end-x8sw.vercel.app"
+  "https://hotel-booking-front-end-x8sw.vercel.app",
+     "https://damainn.com"
 ];
 
 app.use(cors({
