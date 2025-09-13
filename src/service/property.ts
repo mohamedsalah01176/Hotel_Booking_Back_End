@@ -63,17 +63,17 @@ export class PropertyService{
     try{
       const property=await PropertyModel.findOne({_id:propertyId}).lean();
       const properties=await PropertyModel.find({"admin._id":property?.admin?._id}).lean();
-      let lengthOfAllReviews=properties.reduce((acc,item)=>acc+ item.reviews.length,0);
-      let totalRating = properties.reduce(
+      let lengthOfAllReviewsForHost=properties.reduce((acc,item)=>acc+ item.reviews.length,0);
+      let totalRatingForHost = properties.reduce(
         (acc, item) => acc + (item.reviews?.reduce((acc2, review) => acc2 + (review.rate || 0), 0) || 0),
         0
       );      
-      const rotalRatingPercentage = lengthOfAllReviews > 0 ? totalRating / lengthOfAllReviews : 0;;
-      console.log(rotalRatingPercentage)
+      const rotalRatingPercentageForHost = lengthOfAllReviewsForHost > 0 ? totalRatingForHost / lengthOfAllReviewsForHost : 0;
+      
       if(property){
         return{
           status:"success",
-          property:{...property,allReviews:lengthOfAllReviews,rotalRatingPercentage}
+          property:{...property,allReviews:lengthOfAllReviewsForHost,rotalRatingPercentage:rotalRatingPercentageForHost}
         }
       }else{
         return{
@@ -194,15 +194,17 @@ export class PropertyService{
           message: "Access denied. Only hosts can perform this action."
         };
       }
-      const foundProperty=await PropertyModel.findOne({_id:propertyId});
-      if(!foundProperty){
-        return{
-          status:"fail",
-          message:"This Property is not found"
-        }
+      const foundProperty = await PropertyModel.findByIdAndUpdate(
+        propertyId,
+        { $set: { isActive: false } },
+        { new: true }
+      );
+      if (!foundProperty) {
+        return {
+          status: "fail",
+          message: "This property was not found",
+        };
       }
-      foundProperty.set({isActive:false});
-      foundProperty.save()
       return{
         status:"success",
         message:"Property is Stoped"
@@ -222,15 +224,13 @@ export class PropertyService{
           message: "Access denied. Only hosts can perform this action."
         };
       }
-      const foundProperty=await PropertyModel.findOne({_id:propertyId});
+      const foundProperty=await PropertyModel.findByIdAndUpdate(propertyId,{$set:{isActive:true}});
       if(!foundProperty){
         return{
           status:"fail",
           message:"This Property is not found"
         }
       }
-      foundProperty.set({isActive:true});
-      foundProperty.save()
       return{
         status:"success",
         message:"Property is Active"

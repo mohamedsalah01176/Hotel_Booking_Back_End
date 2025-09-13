@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const user_1 = __importDefault(require("../service/user"));
+const user_2 = __importDefault(require("../controler/user"));
+const user_3 = require("../meddileware/user");
+const cloudnary_1 = __importDefault(require("../meddileware/cloudnary"));
+const router = (0, express_1.Router)();
+const userService = new user_1.default();
+const userControler = new user_2.default(userService);
+router.post("/sendCode", (req, res) => userControler.sendCode(req, res));
+router.post("/verfyCode", (req, res) => userControler.verfyCode(req, res));
+router.post("/register", (req, res) => userControler.register(req, res));
+router.post("/login", (req, res) => userControler.login(req, res));
+router.post("/forgetPassword", (req, res) => userControler.forgetPassword(req, res));
+router.post("/resetPassword", (req, res) => userControler.resetPassword(req, res));
+router.get("/setting", user_3.authentication, (req, res) => userControler.getSpecificUser(req, res));
+router.patch("/setting", user_3.authentication, cloudnary_1.default.single("image"), (req, res) => userControler.updateUser(req, res));
+router.get("/users", user_3.authorizationForManager, (req, res) => userControler.getAllUsers(req, res));
+router.delete("/users/:userId", user_3.authorizationForManager, (req, res) => userControler.deleteUser(req, res));
+exports.default = router;

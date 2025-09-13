@@ -23,13 +23,13 @@ const Mongo_URL=process.env.MONGO_URL as string;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/*const limiter=rateLimit({
-     windowMs:15 * 60 * 1000, //  15 minutes
+const limiter=rateLimit({
+     windowMs:15 * 60 * 200, //  15 minutes
      limit:1000, // you have 100 request from one ip address at 15 minutes
     message:"Too many requests, please try again later"
 })
 
-app.use(limiter)*/
+app.use(limiter)
 
 
 // we use it to provide the attacks accourding header
@@ -47,10 +47,11 @@ app.use(helmet({
         action:"deny"
     }
 }))
-
+console.log(process.env.FRONTEND_BASEUSER)
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://hotel-booking-front-end-x8sw.vercel.app"
+  "https://hotel-booking-front-end-x8sw.vercel.app",
+  process.env.FRONTEND_BASEUSER,
 ];
 
 app.use(cors({
