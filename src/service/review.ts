@@ -20,6 +20,11 @@ export default class ReviewServices{
         propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{...translaedBody,user}}});
       }
       if(propertyUpdated.modifiedCount>0){
+        const property=await PropertyModel.findOne({_id:propertyId});
+        const lengthReview=property?.reviews.length as number;
+        const totalRating=property?.reviews.reduce((acc,item)=>acc + (item.rate || 0),0) as number;
+        const averageRate=lengthReview>0? totalRating/lengthReview:0
+        await PropertyModel.updateOne({ _id: propertyId },{ $set: { rate: Number(averageRate.toFixed(1)) } });
         return{
           status:"success",
           message:"Review Added"

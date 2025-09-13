@@ -1,27 +1,39 @@
-import nodemailer from "nodemailer";
-import { ISendQuestion } from "../interface/question";
-
-
-
-export async function sendEmail(userFounded:{email:string},type:string){
-    let transporter =nodemailer.createTransport({
-    service:"gmail",
-    auth: {
-        user: process.env.AUTHEMAIL,
-        pass: process.env.AUTHPASS,
-    },
-    secure: true,
-    port: 465,
-    })
-    let emailContent;
-    if(type=== "password"){
-        let resetLink=`${process.env.FRONTEND_BASEUSER}/resetPassword?email=${userFounded.email}`;
-        emailContent = {
-            from: `"Support Team" <${process.env.AUTHEMAIL}>`,
-            to: userFounded.email,
-            subject: "Reset Your Password",
-            text: `Hello, click the link below to reset your password`,
-            html: `<html>
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendEmail = sendEmail;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+function sendEmail(userFounded, type) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let transporter = nodemailer_1.default.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.AUTHEMAIL,
+                pass: process.env.AUTHPASS,
+            },
+            secure: true,
+            port: 465,
+        });
+        let emailContent;
+        if (type === "password") {
+            let resetLink = `${process.env.FRONTEND_BASEUSER}/resetPassword?email=${userFounded.email}`;
+            emailContent = {
+                from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+                to: userFounded.email,
+                subject: "Reset Your Password",
+                text: `Hello, click the link below to reset your password`,
+                html: `<html>
                         <head>
                             <style>
                                 body {
@@ -79,16 +91,16 @@ export async function sendEmail(userFounded:{email:string},type:string){
                         </body>
                         </html>
                         `,
-        };
-    }
-    if(type === "question"){
-        const data=userFounded as ISendQuestion
-        emailContent = {
-        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
-        to: data.email,
-        subject: "New Question from Contact Form",
-        text: `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nMessage: ${data.message}`,
-        html: `
+            };
+        }
+        if (type === "question") {
+            const data = userFounded;
+            emailContent = {
+                from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+                to: data.email,
+                subject: "New Question from Contact Form",
+                text: `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nMessage: ${data.message}`,
+                html: `
         <html>
             <body style="font-family: Arial, sans-serif; padding: 20px;">
             <h2>New Question Submitted</h2>
@@ -99,9 +111,10 @@ export async function sendEmail(userFounded:{email:string},type:string){
             </body>
         </html>
         `,
-        };
-    }
-    if(emailContent){
-        await transporter.sendMail(emailContent);
-    }
+            };
+        }
+        if (emailContent) {
+            yield transporter.sendMail(emailContent);
+        }
+    });
 }
