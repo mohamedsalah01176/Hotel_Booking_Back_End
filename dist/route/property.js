@@ -1,0 +1,25 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const property_1 = __importDefault(require("../controler/property"));
+const cloudnary_1 = __importDefault(require("../meddileware/cloudnary"));
+const user_1 = require("../meddileware/user");
+const property_2 = require("./../service/property");
+const express_1 = require("express");
+const router = (0, express_1.Router)();
+const propertyService = new property_2.PropertyService();
+const propertyController = new property_1.default(propertyService);
+router.get("/property", (req, res) => propertyController.allProperty(req, res));
+router.delete("/property/:propertyId", user_1.authentication, (req, res) => propertyController.deleteProperty(req, res));
+router.get("/activeProperty", (req, res) => propertyController.allActiveProperty(req, res));
+router.get("/activePropertyForCity/:cityEn", (req, res) => propertyController.allActivePropertiesForCity(req, res));
+router.get("/property/:propertyId", (req, res) => propertyController.specificProperty(req, res));
+router.post("/property", user_1.authentication, cloudnary_1.default.array("images", 30), (req, res) => propertyController.addProperty(req, res));
+router.patch("/property/:propertyId", user_1.authentication, cloudnary_1.default.array("images", 30), (req, res) => propertyController.updateProperty(req, res));
+router.get("/propertyForAdmin", user_1.authentication, (req, res) => propertyController.getPropertyForAdmin(req, res));
+router.get("/propertyDeActive/:propertyId", user_1.authentication, (req, res) => propertyController.DeActiveProperty(req, res));
+router.get("/propertyActive/:propertyId", user_1.authentication, (req, res) => propertyController.ActiveProperty(req, res));
+router.get("/confirmProperty/:propertyId", user_1.authentication, (req, res) => propertyController.confirmProperty(req, res));
+exports.default = router;
