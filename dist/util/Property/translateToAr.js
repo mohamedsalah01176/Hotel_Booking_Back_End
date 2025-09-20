@@ -12,6 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.translateToAr = void 0;
 const parseServicesFromFlatBody_1 = require("../parseServicesFromFlatBody");
 const translate = require("translate-google");
+// ✅ mapping ثابت EN → AR
+const provincesMapEnToAr = {
+    "Rif Dimashq": "ريف دمشق",
+    "Aleppo": "حلب",
+    "Latakia": "اللاذقية",
+    "Tartus": "طرطوس",
+    "Idlib": "إدلب",
+    "Hama": "حماة",
+    "Homs": "حمص",
+};
 const translateToAr = (body) => __awaiter(void 0, void 0, void 0, function* () {
     (0, parseServicesFromFlatBody_1.parseServicesFromFlatBody)(body);
     const translated = JSON.parse(JSON.stringify(body));
@@ -25,8 +35,13 @@ const translateToAr = (body) => __awaiter(void 0, void 0, void 0, function* () {
             translated.descriptionAr = yield translate(body.description, { from: "en", to: "ar" });
         }
         if (body.location) {
-            translated.location.cityEn = body.location.city.toLowerCase();
-            translated.location.cityAr = yield translate(body.location.city, { from: "en", to: "ar" });
+            const city = body.location.city;
+            // ✅ الأول نشوف هل المدينة في الماب؟
+            const mappedCityAr = provincesMapEnToAr[city];
+            translated.location.cityEn = city === "Rif Dimashq" ? "damascus countryside" : city;
+            translated.location.cityAr = mappedCityAr
+                ? mappedCityAr
+                : yield translate(city, { from: "en", to: "ar" });
             translated.location.addressEn = body.location.address;
             translated.location.addressAr = yield translate(body.location.address, { from: "en", to: "ar" });
         }
@@ -34,7 +49,11 @@ const translateToAr = (body) => __awaiter(void 0, void 0, void 0, function* () {
             translated.services = [];
             for (const service of body.services) {
                 const translatedService = yield translate(service.service || "", { from: "en", to: "ar" });
-                translated.services.push({ service: service.service, serviceEn: service.service, serviceAr: translatedService });
+                translated.services.push({
+                    service: service.service,
+                    serviceEn: service.service,
+                    serviceAr: translatedService,
+                });
             }
         }
         if (Array.isArray(body.reviews) && body.reviews.length > 0) {

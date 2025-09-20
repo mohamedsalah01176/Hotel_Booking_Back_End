@@ -14,18 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const property_1 = __importDefault(require("../model/property"));
 const ReservDates_1 = require("../model/ReservDates");
+const sendEmail_1 = require("../util/sendEmail");
 const yapSchema_1 = require("../util/yapSchema");
 class ReservDatesService {
     handleRevesveDates(user, body, propertyId) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            // if(user.role === "user"){
-            //   return{
-            //     status:"error",
-            //     messageEn:"You are not authorized to perform this action.",
-            //     message: "غير مصرح لك بتنفيذ هذا الإجراء"
-            //   }
-            // }
+            console.log("kkkkkkkkkkkkkkkkkkkkk");
             try {
                 yield yapSchema_1.DateSchema.validate(body);
                 const property = yield property_1.default.findOne({ _id: propertyId });
@@ -38,6 +33,9 @@ class ReservDatesService {
                     yield newReservDate.save();
                 }
                 yield (property_1.default === null || property_1.default === void 0 ? void 0 : property_1.default.updateOne({ _id: propertyId }, { $inc: { ordersNumbers: 1 } }));
+                (0, sendEmail_1.sendReservationEmailForUser)(property === null || property === void 0 ? void 0 : property.titleEn, user.email);
+                (0, sendEmail_1.sendReservationEmailForUser)(property === null || property === void 0 ? void 0 : property.titleEn, property === null || property === void 0 ? void 0 : property.admin.email);
+                (0, sendEmail_1.sendReservationEmailForUser)(property === null || property === void 0 ? void 0 : property.titleEn, process.env.AUTHEMAIL);
                 return {
                     status: "success",
                     message: "Date reserved successfully"
@@ -133,11 +131,20 @@ class ReservDatesService {
             }
         });
     }
-    handleDeleteRevervedDate(dateId) {
+    handleDeleteRevervedDate(dateId, user) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const hotel = yield ReservDates_1.ReserveDateModel.findOne({ "reserveDates._id": dateId });
+                const property = yield property_1.default.findOne({ _id: hotel === null || hotel === void 0 ? void 0 : hotel.propertyId });
+                if (!hotel) {
+                    console.error("Reservation not found");
+                    return;
+                }
                 const deletedHotel = yield ReservDates_1.ReserveDateModel.updateOne({ "reserveDates._id": dateId }, { $pull: { reserveDates: { _id: dateId } } });
                 if (deletedHotel.modifiedCount > 0) {
+                    (0, sendEmail_1.sendEmailReservationCancelled)(property === null || property === void 0 ? void 0 : property.titleEn, user.email, dateId);
+                    (0, sendEmail_1.sendEmailReservationCancelled)(property === null || property === void 0 ? void 0 : property.titleEn, property === null || property === void 0 ? void 0 : property.admin.email, dateId);
+                    (0, sendEmail_1.sendEmailReservationCancelled)(property === null || property === void 0 ? void 0 : property.titleEn, process.env.AUTHEMAIL, dateId);
                     return {
                         status: "success",
                         message: "Hotal Deleted"

@@ -18,6 +18,7 @@ const property_1 = __importDefault(require("../model/property"));
 const translatePropertyLogic_1 = require("../util/Property/translatePropertyLogic");
 const translateToAr_1 = require("../util/Property/translateToAr");
 const translateToEn_1 = require("../util/Property/translateToEn");
+const sendEmail_1 = require("../util/sendEmail");
 const yapSchema_1 = require("../util/yapSchema");
 class PropertyService {
     handleAllProperties() {
@@ -233,6 +234,8 @@ class PropertyService {
                         message: "This property was not found",
                     };
                 }
+                (0, sendEmail_1.sendEmailDeactivatedProperty)(foundProperty.titleEn, user.email);
+                (0, sendEmail_1.sendEmailDeactivatedProperty)(foundProperty.titleEn, process.env.AUTHEMAIL);
                 return {
                     status: "success",
                     message: "Property is Stoped"
@@ -262,6 +265,8 @@ class PropertyService {
                         message: "This Property is not found"
                     };
                 }
+                (0, sendEmail_1.sendEmailActivatedProperty)(foundProperty.titleEn, user.email);
+                (0, sendEmail_1.sendEmailActivatedProperty)(foundProperty.titleEn, process.env.AUTHEMAIL);
                 return {
                     status: "success",
                     message: "Property is Active"
@@ -277,6 +282,7 @@ class PropertyService {
     }
     handleConfirmProperty(propertyId) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const foundProperty = yield property_1.default.findOne({ _id: propertyId });
                 if (!foundProperty) {
@@ -287,6 +293,7 @@ class PropertyService {
                 }
                 foundProperty.set({ isConfirmed: true });
                 foundProperty.save();
+                (0, sendEmail_1.sendEmailCreatedProperty)(foundProperty === null || foundProperty === void 0 ? void 0 : foundProperty.title, (_a = foundProperty === null || foundProperty === void 0 ? void 0 : foundProperty.admin) === null || _a === void 0 ? void 0 : _a.email);
                 return {
                     status: "success",
                     message: "Property is confirmed"
@@ -311,6 +318,7 @@ class PropertyService {
                     };
                 }
                 yield city_1.default.updateOne({ nameEn: deletedProperty.location.cityEn }, { $inc: { numberOfHotel: -1 } });
+                (0, sendEmail_1.sendEmailManagerDeletedProperty)(deletedProperty.titleEn, deletedProperty.admin.email);
                 return {
                     status: "success",
                     message: "Property has been deleted"

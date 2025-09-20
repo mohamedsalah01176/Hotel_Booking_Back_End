@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ReponseStatues } from "../util/ResponseStatus";
-import { IUserPayload } from "../interface/user";
+import {  IUserPayload } from "../interface/user";
 import ReservDatesService from "../service/reservDates";
 
 export default class ReservDatesController{
@@ -29,7 +29,8 @@ export default class ReservDatesController{
   }
   async deleteRevervedDate(req:Request,res:Response){
     const dateId=req.params.dateId
-    const responseServicer= await this.reverveDateService.handleDeleteRevervedDate(dateId);
+    const user=req.user as IUserPayload
+    const responseServicer= await this.reverveDateService.handleDeleteRevervedDate(dateId,user);
     ReponseStatues(responseServicer,res)
   }
 }

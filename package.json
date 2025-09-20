@@ -9,12 +9,16 @@
     "build": "tsc -p ./"
   },
   "author": "",
-  "engines":{
-    "node":"22.14.0"
+  "engines": {
+    "node": "22.14.0"
   },
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/node": "^24.4.0",
+    "@vonage/auth": "^1.12.1",
+    "@vonage/messages": "^1.21.5",
+    "@vonage/server-sdk": "^3.24.3",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "compression": "^1.8.0",

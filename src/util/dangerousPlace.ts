@@ -1,9 +1,32 @@
-export const dangerousPlaces = [
-  "Daraa",
-  "Al-Quneitra", "Quneitra",
-  "As-Suwayda", "Suwayda",
-  "Deir ez-Zor",
-  "Raqqa",
-  "Al-Hasakah", "Hasakah",
-  "Al-Qamishli", "Qamishli"
+export const safeProvincesEn = [
+  "Rif Dimashq",
+  "Aleppo",
+  "Latakia",
+  "Tartus",
+  "Idlib",
+  "Hama",
+  "Homs",
+  "Damascus Countryside Governorate",
+  "Aleppo Governorate",
+  "Latakia Governorate",
+  "Tartus Governorate",
+  "Idlib Governorate",
+  "Hama Governorate",
+  "Homs Governorate",
+];
+export const safeProvincesAr = [
+  "ريف دمشق",
+  "حلب",
+  "اللاذقية",
+  "طرطوس",
+  "إدلب",
+  "حماة",
+  "حمص",
+  "محافظة ريف دمشق",
+  "محافظة حلب",
+  "محافظة اللاذقية",
+  "محافظة طرطوس",
+  "محافظة إدلب",
+  "محافظة حماة",
+  "محافظة حمص"
 ];

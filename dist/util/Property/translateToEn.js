@@ -12,6 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.translateToEn = void 0;
 const parseServicesFromFlatBody_1 = require("../parseServicesFromFlatBody");
 const translate = require("translate-google");
+const provincesMapArToEn = {
+    "ريف دمشق": "Damascus Countryside",
+    "حلب": "Aleppo",
+    "اللاذقية": "Latakia",
+    "طرطوس": "Tartus",
+    "إدلب": "Idlib",
+    "حماة": "Hama",
+    "حمص": "Homs"
+};
 const translateToEn = (body) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     (0, parseServicesFromFlatBody_1.parseServicesFromFlatBody)(body);
@@ -25,9 +34,18 @@ const translateToEn = (body) => __awaiter(void 0, void 0, void 0, function* () {
             translatedBody.descriptionAr = body.description;
             translatedBody.descriptionEn = yield translate(body.description, { from: "ar", to: "en" });
         }
-        if (body.location.city) {
-            translatedBody.location.cityAr = (_a = body.location.city) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-            translatedBody.location.cityEn = (_b = (yield translate(body.location.city, { from: "ar", to: "en" }))) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+        if ((_a = body.location) === null || _a === void 0 ? void 0 : _a.city) {
+            const cityAr = body.location.city;
+            // ✅ استخدام الماب أولاً
+            if (provincesMapArToEn[cityAr]) {
+                translatedBody.location.cityAr = cityAr;
+                translatedBody.location.cityEn = provincesMapArToEn[cityAr].toLowerCase();
+            }
+            else {
+                // fallback على Google Translate
+                translatedBody.location.cityAr = cityAr;
+                translatedBody.location.cityEn = (_b = (yield translate(cityAr, { from: "ar", to: "en" }))) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+            }
             translatedBody.location.addressAr = body.location.address;
             translatedBody.location.addressEn = yield translate(body.location.address, { from: "ar", to: "en" });
         }
@@ -35,7 +53,11 @@ const translateToEn = (body) => __awaiter(void 0, void 0, void 0, function* () {
             translatedBody.services = [];
             for (const service of body.services) {
                 const translatedService = yield translate(service.service, { from: "ar", to: "en" });
-                translatedBody.services.push({ service: service.service, serviceAr: service.service, serviceEn: translatedService });
+                translatedBody.services.push({
+                    service: service.service,
+                    serviceAr: service.service,
+                    serviceEn: translatedService
+                });
             }
         }
         if (Array.isArray(body.reviews) && body.reviews.length > 0) {
@@ -45,7 +67,6 @@ const translateToEn = (body) => __awaiter(void 0, void 0, void 0, function* () {
                 translatedBody.reviews.push(Object.assign(Object.assign({}, review), { data: review.data, dataAr: review.data, dataEn: translatedReview }));
             }
         }
-        // console.log("✅ Translated Body:", JSON.stringify(translatedBody, null, 2));
         console.log(translatedBody);
         return translatedBody;
     }

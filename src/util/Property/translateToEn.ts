@@ -2,9 +2,20 @@ import { IProperty } from "../../interface/property";
 import { parseServicesFromFlatBody } from "../parseServicesFromFlatBody";
 const translate = require("translate-google");
 
+const provincesMapArToEn: Record<string, string> = {
+  "ريف دمشق": "Damascus Countryside",
+  "حلب": "Aleppo",
+  "اللاذقية": "Latakia",
+  "طرطوس": "Tartus",
+  "إدلب": "Idlib",
+  "حماة": "Hama",
+  "حمص": "Homs"
+};
+
 export const translateToEn = async (body: IProperty): Promise<IProperty> => {
-  parseServicesFromFlatBody(body)
+  parseServicesFromFlatBody(body);
   let translatedBody: IProperty = JSON.parse(JSON.stringify(body));
+
   try {
     if (body.title) {
       translatedBody.titleAr = body.title;
@@ -16,9 +27,18 @@ export const translateToEn = async (body: IProperty): Promise<IProperty> => {
       translatedBody.descriptionEn = await translate(body.description, { from: "ar", to: "en" });
     }
 
-    if (body.location.city) {
-      translatedBody.location.cityAr = body.location.city?.toLowerCase();
-      translatedBody.location.cityEn = (await translate(body.location.city, { from: "ar", to: "en" }))?.toLowerCase();
+    if (body.location?.city) {
+      const cityAr = body.location.city;
+
+      // ✅ استخدام الماب أولاً
+      if (provincesMapArToEn[cityAr]) {
+        translatedBody.location.cityAr = cityAr;
+        translatedBody.location.cityEn = provincesMapArToEn[cityAr].toLowerCase();
+      } else {
+        // fallback على Google Translate
+        translatedBody.location.cityAr = cityAr;
+        translatedBody.location.cityEn = (await translate(cityAr, { from: "ar", to: "en" }))?.toLowerCase();
+      }
 
       translatedBody.location.addressAr = body.location.address;
       translatedBody.location.addressEn = await translate(body.location.address, { from: "ar", to: "en" });
@@ -29,7 +49,11 @@ export const translateToEn = async (body: IProperty): Promise<IProperty> => {
 
       for (const service of body.services) {
         const translatedService = await translate(service.service, { from: "ar", to: "en" });
-        translatedBody.services.push({service:service.service,serviceAr:service.service,serviceEn:translatedService});
+        translatedBody.services.push({
+          service: service.service,
+          serviceAr: service.service,
+          serviceEn: translatedService
+        });
       }
     }
 
@@ -38,12 +62,16 @@ export const translateToEn = async (body: IProperty): Promise<IProperty> => {
 
       for (const review of body.reviews) {
         const translatedReview = await translate(review.data, { from: "ar", to: "en" });
-        translatedBody.reviews.push({...review,data:review.data,dataAr:review.data,dataEn:translatedReview});
+        translatedBody.reviews.push({
+          ...review,
+          data: review.data,
+          dataAr: review.data,
+          dataEn: translatedReview
+        });
       }
     }
 
-    // console.log("✅ Translated Body:", JSON.stringify(translatedBody, null, 2));
-    console.log(translatedBody)
+    console.log(translatedBody);
     return translatedBody;
   } catch (err) {
     console.error("❌ Translation Error:", err);

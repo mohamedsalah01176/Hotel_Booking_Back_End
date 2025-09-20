@@ -2,7 +2,7 @@ import { IQuestion, IQuestionBody, IQuestionBodyUpdate, ISendQuestion } from "..
 import QuestionsModel from "../model/commonQuestions";
 import { translateToAr } from "../util/Questions/translateToAr";
 import { translateToEn } from "../util/Questions/translateToEn";
-import { sendEmail } from "../util/sendEmail";
+import { sendEmailChange } from "../util/sendEmail";
 
 export default class CommonQuestionsServices{
   constructor(){}
@@ -90,7 +90,7 @@ export default class CommonQuestionsServices{
   async handleSendQuestionsForEmail(body:ISendQuestion){
     try{
       
-      await sendEmail(body,"question")
+      await sendEmailChange(body,"question")
       return{
         status:"success",
         message :"Emial Sended"

@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_1 = __importDefault(require("../model/user"));
-const sendMessage_1 = require("../util/sendMessage");
 const yapSchema_1 = require("../util/yapSchema");
 const sendEmail_1 = require("../util/sendEmail");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -28,20 +27,20 @@ class UserService {
             if (!body) {
                 return {
                     status: 'fail',
-                    messageEn: "The Phone is Required",
-                    messageAr: "يجب ادخال رقم التليفون",
+                    messageEn: "The Email is Required",
+                    messageAr: "يجب ادخال الايميل",
                 };
             }
             try {
-                console.log(body.phone, "phone");
+                console.log(body, "body");
                 let code = Math.floor(100000 + Math.random() * 900000);
-                otpStore[body.phone] = code.toString();
-                if (body.type === "whatsApp") {
-                    yield (0, sendMessage_1.sendMessageWhatsUp)(code, body.phone);
-                }
-                else {
-                    yield (0, sendMessage_1.sendMessageSMS)(code, body.phone);
-                }
+                otpStore[body.email] = code.toString();
+                (0, sendEmail_1.sendEmailCode)(code, body.email);
+                // if(body.type === "whatsApp"){
+                //   await sendMessageWhatsUp(code,body.phone);
+                // }else{
+                //   await sendMessageSMS(code,body.phone);
+                // }
                 return {
                     status: "success",
                     meessageEn: "Code Sended",
@@ -68,24 +67,36 @@ class UserService {
             if (!body) {
                 return {
                     status: 'fail',
-                    messageEn: "The Phone is Required",
-                    messageAr: "يجب ادخال رقم التليفون",
+                    messageEn: "The Email is Required",
+                    messageAr: "يجب ادخال رقم الايميل",
                 };
             }
             try {
-                if (body.code !== otpStore[body.phone]) {
+                if (body.code !== otpStore[body.email]) {
                     return {
                         status: "fail",
-                        messageEn: "Sorry, we are not able to verify the code. Please make sure you input the right mobile number and code.",
-                        messageAr: "عذرًا، لا يمكننا التحقق من الرمز. يرجى التأكد من إدخال رقم الهاتف والرمز الصحيح"
+                        messageEn: "Sorry, we are not able to verify the code. Please make sure you input the right Email and code.",
+                        messageAr: "عذرًا، لا يمكننا التحقق من الرمز. يرجى التأكد من إدخال الايميل والرمز الصحيح"
                     };
                 }
-                delete otpStore[body.phone];
-                yield user_1.default.updateOne({ phone: body.phone }, { $set: { phoneVerfy: true } });
+                delete otpStore[body.email];
+                const newUser = yield user_1.default.findOneAndUpdate({ email: body.email }, { $set: { phoneVerfy: true } }, { new: true });
+                const payload = {
+                    _id: newUser === null || newUser === void 0 ? void 0 : newUser._id,
+                    name: newUser === null || newUser === void 0 ? void 0 : newUser.name,
+                    email: newUser === null || newUser === void 0 ? void 0 : newUser.email,
+                    role: newUser === null || newUser === void 0 ? void 0 : newUser.role,
+                    phone: newUser === null || newUser === void 0 ? void 0 : newUser.phone,
+                    image: newUser === null || newUser === void 0 ? void 0 : newUser.image,
+                    phoneVerfy: newUser === null || newUser === void 0 ? void 0 : newUser.phoneVerfy,
+                    createdAt: newUser === null || newUser === void 0 ? void 0 : newUser.createdAt
+                };
+                let token = jsonwebtoken_1.default.sign(payload, process.env.SECTERTOKENKEY, { expiresIn: "30d" });
                 return {
                     status: "success",
                     messageEn: "verfiy correct",
                     messageAr: "التحقيق صحيح",
+                    token
                 };
             }
             catch (errors) {
@@ -220,7 +231,7 @@ class UserService {
                         messageAr: "الايميل غير مسجل"
                     };
                 }
-                yield (0, sendEmail_1.sendEmail)(userFounded, "password");
+                yield (0, sendEmail_1.sendEmailChange)(userFounded, "password");
                 return {
                     status: "success",
                     messageEn: "Check your gmail account",

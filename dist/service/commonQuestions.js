@@ -111,7 +111,7 @@ class CommonQuestionsServices {
     handleSendQuestionsForEmail(body) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield (0, sendEmail_1.sendEmail)(body, "question");
+                yield (0, sendEmail_1.sendEmailChange)(body, "question");
                 return {
                     status: "success",
                     message: "Emial Sended"

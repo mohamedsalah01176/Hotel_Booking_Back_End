@@ -46,7 +46,8 @@ class ReservDatesController {
     deleteRevervedDate(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const dateId = req.params.dateId;
-            const responseServicer = yield this.reverveDateService.handleDeleteRevervedDate(dateId);
+            const user = req.user;
+            const responseServicer = yield this.reverveDateService.handleDeleteRevervedDate(dateId, user);
             (0, ResponseStatus_1.ReponseStatues)(responseServicer, res);
         });
     }

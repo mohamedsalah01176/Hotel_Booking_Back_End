@@ -3,17 +3,16 @@ import { ISendQuestion } from "../interface/question";
 
 
 
-export async function sendEmail(userFounded:{email:string},type:string){
+export async function sendEmailChange(userFounded:{email:string},type:string){
     let transporter =nodemailer.createTransport({
     service:"gmail",
     auth: {
         user: process.env.AUTHEMAIL,
         pass: process.env.AUTHPASS,
     },
-    secure: true,
-    port: 465,
     })
     let emailContent;
+
     if(type=== "password"){
         let resetLink=`${process.env.FRONTEND_BASEUSER}/resetPassword?email=${userFounded.email}`;
         emailContent = {
@@ -82,10 +81,11 @@ export async function sendEmail(userFounded:{email:string},type:string){
         };
     }
     if(type === "question"){
+        console.log("cccccccccccccccccc")
         const data=userFounded as ISendQuestion
         emailContent = {
-        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
-        to: data.email,
+        from: `"Question From" <${data.email }>`,
+        to: process.env.AUTHEMAIL,
         subject: "New Question from Contact Form",
         text: `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nMessage: ${data.message}`,
         html: `
@@ -102,6 +102,616 @@ export async function sendEmail(userFounded:{email:string},type:string){
         };
     }
     if(emailContent){
-        await transporter.sendMail(emailContent);
+        const res=await transporter.sendMail(emailContent);
+    }
+}
+
+export async function sendEmailCode(code: number, userEmail:string) {
+    
+    let transporter =nodemailer.createTransport({
+    service:"gmail",
+    auth: {
+        user: process.env.AUTHEMAIL,
+        pass: process.env.AUTHPASS,
+    },
+    })
+    let emailContent;
+    emailContent = {
+            from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+            to: userEmail,
+            subject: "OTP Code",
+            text: `Hello, click the link below to get your OTP Code`,
+            html: `<html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    .email-container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        background: #ffffff;
+                        padding: 30px 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        text-align: center;
+                    }
+
+                    h2 {
+                        color: #333;
+                    }
+
+                    p {
+                        font-size: 16px;
+                        color: #555;
+                    }
+
+                    .otp-code {
+                        display: inline-block;
+                        margin: 20px 0;
+                        padding: 15px 25px;
+                        font-size: 28px;
+                        font-weight: bold;
+                        color: #ffffff;
+                        background: #007bff;
+                        border-radius: 8px;
+                        letter-spacing: 5px;
+                    }
+
+                    .footer {
+                        margin-top: 25px;
+                        font-size: 14px;
+                        color: #888;
+                    }
+
+                    @media (max-width: 480px) {
+                        .otp-code {
+                            font-size: 22px;
+                            padding: 12px 20px;
+                            letter-spacing: 4px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <h2>Your OTP Code</h2>
+                    <p>Use the following OTP to complete your action. It expires in 10 minutes.</p>
+                    <div class="otp-code">${code}</div>
+                    <p>If you did not request this code, please ignore this email.</p>
+                    <p class="footer">This is an automated message, please do not reply.</p>
+                </div>
+            </body>
+            </html>
+            `
+        };
+        if(emailContent){
+            const res=await transporter.sendMail(emailContent);
+            console.log(res)
+        }
+}
+
+export async function sendEmailCreatedProperty(propertyName: string, userEmail:string) {
+    
+    let transporter =nodemailer.createTransport({
+    service:"gmail",
+    auth: {
+        user: process.env.AUTHEMAIL,
+        pass: process.env.AUTHPASS,
+    },
+
+    })
+    let emailContent;
+    emailContent = {
+            from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+            to: userEmail,
+            subject: "Property Successfully Created",
+            text: `Hello, your property "${propertyName.split(" ").slice(0,3).join(" ")}" has been created successfully. You can add more properties without waiting for confirmation.`,
+            html: `
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background-color: #f5f5f5;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .email-container {
+                        max-width: 600px;
+                        margin: 30px auto;
+                        background: #ffffff;
+                        padding: 40px 30px;
+                        border-radius: 12px;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                        text-align: center;
+                    }
+                    h2 {
+                        color: #222;
+                        margin-bottom: 10px;
+                    }
+                    p {
+                        font-size: 16px;
+                        color: #555;
+                        margin: 10px 0;
+                    }
+                    .highlight {
+                        font-weight: bold;
+                        color: #007bff;
+                    }
+                    .footer {
+                        margin-top: 25px;
+                        font-size: 14px;
+                        color: #888;
+                    }
+                    .button {
+                        display: inline-block;
+                        margin-top: 20px;
+                        padding: 12px 30px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #ffffff;
+                        background-color: #28a745;
+                        text-decoration: none;
+                        border-radius: 6px;
+                    }
+                    .button:hover {
+                        background-color: #218838;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <h2>Property Created Successfully!</h2>
+                    <p>Hello,</p>
+                    <p>Your property <span class="highlight">${propertyName}</span> has been created successfully.</p>
+                    <p>You can add more properties anytime without waiting for confirmation.</p>
+                    <a href="https://yourwebsite.com/add-property" class="button">Add Another Property</a>
+                    <p class="footer">This is an automated message, please do not reply.</p>
+                </div>
+            </body>
+            </html>
+            `
+        };
+        if(emailContent){
+            const res=await transporter.sendMail(emailContent);
+            console.log(res)
+        }
+}
+
+export async function sendEmailActivatedProperty(propertyName: string, userEmail: string) {
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.AUTHEMAIL,
+            pass: process.env.AUTHPASS,
+        },
+    });
+
+    let resetLink=`${process.env.FRONTEND_BASEUSER}/dashboard`;
+    // Email content
+    const emailContent = {
+        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+        to: userEmail,
+        subject: "Property Activated",
+        text: `Hello, your property "${propertyName.split(" ").slice(0, 3).join(" ")}" has been activated and is now live.`,
+        html: `
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 0;
+                }
+                .email-container {
+                    max-width: 600px;
+                    margin: 30px auto;
+                    background: #ffffff;
+                    padding: 40px 30px;
+                    border-radius: 12px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                h2 {
+                    color: #222;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 16px;
+                    color: #555;
+                    margin: 10px 0;
+                }
+                .highlight {
+                    font-weight: bold;
+                    color: #28a745;
+                }
+                .footer {
+                    margin-top: 25px;
+                    font-size: 14px;
+                    color: #888;
+                }
+                .button {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #ffffff;
+                    background-color: #28a745;
+                    text-decoration: none;
+                    border-radius: 6px;
+                }
+                .button:hover {
+                    background-color: #218838;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <h2>Property Activated</h2>
+                <p>Hello,</p>
+                <p>Your property <span class="highlight">${propertyName}</span> has been activated and is now live.</p>
+                <p>You can share it with potential guests and start receiving bookings.</p>
+                <a href='${resetLink} class="button">Manage Property</a>
+                <p class="footer">This is an automated message, please do not reply.</p>
+            </div>
+        </body>
+        </html>
+        `
+    };
+    if(emailContent){
+        const res=await transporter.sendMail(emailContent);
+        console.log(res)
+    }
+}
+
+export async function sendEmailDeactivatedProperty(propertyName: string, userEmail: string) {
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.AUTHEMAIL,
+            pass: process.env.AUTHPASS,
+        },
+    });
+
+    // Email content
+    const emailContent = {
+        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+        to: userEmail,
+        subject: "Property Deactivated",
+        text: `Hello, your property "${propertyName.split(" ").slice(0, 3).join(" ")}" has been deactivated by the host.`,
+        html: `
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 0;
+                }
+                .email-container {
+                    max-width: 600px;
+                    margin: 30px auto;
+                    background: #ffffff;
+                    padding: 40px 30px;
+                    border-radius: 12px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                h2 {
+                    color: #222;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 16px;
+                    color: #555;
+                    margin: 10px 0;
+                }
+                .highlight {
+                    font-weight: bold;
+                    color: #ffc107;
+                }
+                .footer {
+                    margin-top: 25px;
+                    font-size: 14px;
+                    color: #888;
+                }
+                .button {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #ffffff;
+                    background-color: #ffc107;
+                    text-decoration: none;
+                    border-radius: 6px;
+                }
+                .button:hover {
+                    background-color: #e0a800;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <h2>Property Deactivated</h2>
+                <p>Hello,</p>
+                <p>Your property <span class="highlight">${propertyName}</span> has been deactivated by the host.</p>
+                <p>If this was unexpected, you can contact support for more information.</p>
+            </div>
+        </body>
+        </html>
+        `
+    };
+
+    if(emailContent){
+        const res=await transporter.sendMail(emailContent);
+        console.log(res)
+    }
+}
+
+export async function sendEmailManagerDeletedProperty(propertyName: string, userEmail: string) {
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.AUTHEMAIL,
+            pass: process.env.AUTHPASS,
+        },
+    });
+
+    const emailContent = {
+        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+        to: userEmail,
+        subject: "Property Removed by Manager",
+        text: `Hello, your property "${propertyName.split(" ").slice(0,3).join(" ")}" has been removed by the manager.`,
+        html: `
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 0;
+                }
+                .email-container {
+                    max-width: 600px;
+                    margin: 30px auto;
+                    background: #ffffff;
+                    padding: 40px 30px;
+                    border-radius: 12px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                h2 {
+                    color: #222;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 16px;
+                    color: #555;
+                    margin: 10px 0;
+                }
+                .highlight {
+                    font-weight: bold;
+                    color: #dc3545;
+                }
+                .footer {
+                    margin-top: 25px;
+                    font-size: 14px;
+                    color: #888;
+                }
+                .button {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #ffffff;
+                    background-color: #dc3545;
+                    text-decoration: none;
+                    border-radius: 6px;
+                }
+                .button:hover {
+                    background-color: #c82333;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <h2>Property Removed</h2>
+                <p>Hello,</p>
+                <p>Your property <span class="highlight">${propertyName}</span> has been removed by the manager.</p>
+                <p>If you think this was a mistake or want more details, please contact support.</p>
+            </div>
+        </body>
+        </html>
+        `
+    };
+    if(emailContent){
+        const res=await transporter.sendMail(emailContent);
+        console.log(res)
+    }
+}
+
+export async function sendReservationEmailForUser(propertyName:string,userEmail:string){
+    let trannsport=nodemailer.createTransport({
+        service:"gmail",
+        auth:{
+            user: process.env.AUTHEMAIL,
+            pass: process.env.AUTHPASS,
+        },
+    });
+    let resetLink=`${process.env.FRONTEND_BASEUSER}/setting/#listing`;
+    let emailContenet = {
+        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+        to: userEmail,
+        subject: "Reservation Confirmed – DAMA INN",
+        text: `Hello, your reservation for "${propertyName.split(" ").slice(0, 3).join(" ")}" has been confirmed successfully. We look forward to welcoming you soon.`,
+        html: `
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 0;
+                }
+                .email-container {
+                    max-width: 600px;
+                    margin: 30px auto;
+                    background: #ffffff;
+                    padding: 40px 30px;
+                    border-radius: 12px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                h2 {
+                    color: #222;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 16px;
+                    color: #555;
+                    margin: 10px 0;
+                }
+                .highlight {
+                    font-weight: bold;
+                    color: #007bff;
+                }
+                .footer {
+                    margin-top: 25px;
+                    font-size: 14px;
+                    color: #888;
+                }
+                .button {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #ffffff;
+                    background-color: #28a745;
+                    text-decoration: none;
+                    border-radius: 6px;
+                }
+                .button:hover {
+                    background-color: #218838;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <h2>Reservation Confirmed!</h2>
+                <p>Hello,</p>
+                <p>Your reservation at <span class="highlight">${propertyName}</span> has been confirmed successfully.</p>
+                <p>We look forward to welcoming you soon. Please remember, payment will be made upon arrival.</p>
+                <a href=${resetLink} class="button">View My Reservations</a>
+                <p class="footer">This is an automated message, please do not reply.</p>
+            </div>
+        </body>
+        </html>
+        `
+    };
+    
+        if(emailContenet){
+            let res=await trannsport.sendMail(emailContenet)
+            console.log(res)
+        }
+}
+
+export async function sendEmailReservationCancelled(propertyName: string, userEmail: string, reservationDate: string) {
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.AUTHEMAIL,
+            pass: process.env.AUTHPASS,
+        },
+    });
+
+    // Email content
+    const emailContent = {
+        from: `"Support Team" <${process.env.AUTHEMAIL}>`,
+        to: userEmail,
+        subject: "Reservation Cancelled",
+        text: `Hello, your reservation for "${propertyName.split(" ").slice(0,3).join(" ")}" on ${reservationDate} has been cancelled successfully.`,
+        html: `
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 0;
+                }
+                .email-container {
+                    max-width: 600px;
+                    margin: 30px auto;
+                    background: #ffffff;
+                    padding: 40px 30px;
+                    border-radius: 12px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                h2 {
+                    color: #222;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 16px;
+                    color: #555;
+                    margin: 10px 0;
+                }
+                .highlight {
+                    font-weight: bold;
+                    color: #dc3545;
+                }
+                .footer {
+                    margin-top: 25px;
+                    font-size: 14px;
+                    color: #888;
+                }
+                .button {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #ffffff;
+                    background-color: #dc3545;
+                    text-decoration: none;
+                    border-radius: 6px;
+                }
+                .button:hover {
+                    background-color: #c82333;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <h2>Reservation Cancelled</h2>
+                <p>Hello,</p>
+                <p>Your reservation for <span class="highlight">${propertyName}</span> on <span class="highlight">${reservationDate}</span> has been cancelled successfully.</p>
+                <p>You can make a new reservation anytime.</p>
+            </div>
+        </body>
+        </html>
+        `
+    }
+    if(emailContent){
+        const res=await transporter.sendMail(emailContent);
+        console.log(res)
     }
 }

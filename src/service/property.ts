@@ -5,6 +5,7 @@ import PropertyModel from "../model/property";
 import { translateToArLogic, translateToEnLogic } from "../util/Property/translatePropertyLogic";
 import { translateToAr } from "../util/Property/translateToAr";
 import { translateToEn } from "../util/Property/translateToEn";
+import { sendEmailActivatedProperty, sendEmailCreatedProperty, sendEmailDeactivatedProperty, sendEmailManagerDeletedProperty } from "../util/sendEmail";
 import { propertySchema } from "../util/yapSchema";
 
 export class PropertyService{
@@ -205,6 +206,8 @@ export class PropertyService{
           message: "This property was not found",
         };
       }
+      sendEmailDeactivatedProperty(foundProperty.titleEn!,user.email!)
+      sendEmailDeactivatedProperty(foundProperty.titleEn!,process.env.AUTHEMAIL!)
       return{
         status:"success",
         message:"Property is Stoped"
@@ -231,6 +234,8 @@ export class PropertyService{
           message:"This Property is not found"
         }
       }
+      sendEmailActivatedProperty(foundProperty.titleEn!,user.email);
+      sendEmailActivatedProperty(foundProperty.titleEn!,process.env.AUTHEMAIL!);
       return{
         status:"success",
         message:"Property is Active"
@@ -253,6 +258,7 @@ export class PropertyService{
       }
       foundProperty.set({isConfirmed:true});
       foundProperty.save()
+      sendEmailCreatedProperty(foundProperty?.title,foundProperty?.admin?.email)
       return{
         status:"success",
         message:"Property is confirmed"
@@ -275,6 +281,7 @@ export class PropertyService{
       };
     }
     await CityModel.updateOne({nameEn:deletedProperty.location.cityEn},{$inc:{numberOfHotel:-1}})
+    sendEmailManagerDeletedProperty(deletedProperty.titleEn!,deletedProperty.admin.email!)
     return {
       status: "success",
       message: "Property has been deleted"
