@@ -18,6 +18,7 @@ const yapSchema_1 = require("../util/yapSchema");
 const sendEmail_1 = require("../util/sendEmail");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const property_1 = __importDefault(require("../model/property"));
+const crypto_1 = __importDefault(require("crypto"));
 let otpStore = {};
 class UserService {
     constructor() { }
@@ -231,7 +232,12 @@ class UserService {
                         messageAr: "الايميل غير مسجل"
                     };
                 }
-                yield (0, sendEmail_1.sendEmailChange)(userFounded, "password");
+                const restToken = yield crypto_1.default.randomBytes(32).toString("hex");
+                const hashToken = yield bcrypt_1.default.hash(restToken, parseInt(process.env.SALTPASSWORD));
+                userFounded.token = hashToken;
+                userFounded.tokenExpireData = new Date(Date.now() + 15 * 60 * 1000);
+                yield userFounded.save();
+                yield (0, sendEmail_1.sendEmailChange)({ email: userFounded.email, restToken }, "password");
                 return {
                     status: "success",
                     messageEn: "Check your gmail account",
@@ -248,26 +254,42 @@ class UserService {
     }
     handleResetPassword(body) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!body) {
+            if (!body.token || !body.password) {
                 return {
                     status: "fail",
-                    messageEn: "Email Not Found",
-                    messageAr: "الايميل غير مسجل",
+                    message: "Token and new password are required",
+                    messageAr: "الرمز وكلمة المرور الجديدة مطلوبان"
                 };
             }
             try {
-                let validateBody = yield yapSchema_1.loginBodySchema.validate(body);
-                let foundUser = yield user_1.default.findOne({ email: validateBody.emailOrPhone });
-                if (!foundUser) {
+                const user = yield user_1.default.findOne({
+                    token: { $exists: true },
+                    tokenExpireData: { $gt: Date.now() }
+                });
+                if (!user) {
                     return {
                         status: "fail",
-                        messageEn: "Email is not Registered",
-                        messageAr: "البريد الإلكتروني غير مسجّل"
+                        message: "Invalid or expired token",
+                        messageAr: "الرمز غير صالح أو منتهي الصلاحية"
+                    };
+                }
+                yield yapSchema_1.ressetPasswordBodySchema.validate(body);
+                const isTokenValid = yield bcrypt_1.default.compare(body.token, user.token);
+                console.log(body.token, "body");
+                console.log(user === null || user === void 0 ? void 0 : user.token, "user");
+                if (!isTokenValid) {
+                    return {
+                        status: "fail",
+                        message: "Invalid token",
+                        messageAr: "الرمز غير صالح"
                     };
                 }
                 let bcriptPassword = yield bcrypt_1.default.hash(body.password, parseInt(process.env.SALTPASSWORD));
-                let updateUser = yield user_1.default.updateOne({ email: validateBody.emailOrPhone }, { $set: { password: bcriptPassword } });
-                if (updateUser.modifiedCount) {
+                user.password = bcriptPassword;
+                user.token = "";
+                user.tokenExpireData = new Date(0);
+                const updateUser = yield user.save();
+                if (updateUser) {
                     return {
                         status: "success",
                         messageEn: "Password Updated",

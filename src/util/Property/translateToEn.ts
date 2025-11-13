@@ -3,6 +3,7 @@ import { parseServicesFromFlatBody } from "../parseServicesFromFlatBody";
 const translate = require("translate-google");
 
 const provincesMapArToEn: Record<string, string> = {
+  "دمشق": "Damascus",
   "ريف دمشق": "Damascus Countryside",
   "حلب": "Aleppo",
   "اللاذقية": "Latakia",

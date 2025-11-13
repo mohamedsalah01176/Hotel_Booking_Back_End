@@ -46,6 +46,14 @@ const Schema = new mongoose_1.default.Schema({
     image: {
         type: String,
         default: null
+    },
+    token: {
+        type: String,
+        default: null,
+    },
+    tokenExpireData: {
+        type: Date,
+        default: null,
     }
 }, {
     timestamps: true

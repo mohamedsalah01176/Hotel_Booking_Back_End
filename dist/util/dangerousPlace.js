@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.safeProvincesAr = exports.safeProvincesEn = void 0;
 exports.safeProvincesEn = [
     "Rif Dimashq",
+    "Dimashq",
+    "Damascus",
     "Aleppo",
     "Latakia",
     "Tartus",
@@ -10,6 +12,7 @@ exports.safeProvincesEn = [
     "Hama",
     "Homs",
     "Damascus Countryside Governorate",
+    "Damascus Governorate",
     "Aleppo Governorate",
     "Latakia Governorate",
     "Tartus Governorate",
@@ -19,6 +22,7 @@ exports.safeProvincesEn = [
 ];
 exports.safeProvincesAr = [
     "ريف دمشق",
+    "دمشق",
     "حلب",
     "اللاذقية",
     "طرطوس",
@@ -26,6 +30,7 @@ exports.safeProvincesAr = [
     "حماة",
     "حمص",
     "محافظة ريف دمشق",
+    "محافظة دمشق",
     "محافظة حلب",
     "محافظة اللاذقية",
     "محافظة طرطوس",

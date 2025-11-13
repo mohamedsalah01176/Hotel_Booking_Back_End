@@ -133,15 +133,17 @@ class PropertyService {
                 else {
                     yield (0, translatePropertyLogic_1.translateToArLogic)(body, adminBody);
                 }
+                console.log("success");
                 return {
                     status: "success",
                     message: "Your property has been submitted and is waiting for manager review."
                 };
             }
             catch (errors) {
+                console.log("error", errors);
                 return {
                     status: "error",
-                    errors
+                    errors,
                 };
             }
         });

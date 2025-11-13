@@ -20,8 +20,7 @@ const app =express();
 const Port=process.env.PORT;
 const Mongo_URL=process.env.MONGO_URL as string;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
 
 const limiter=rateLimit({
      windowMs:15 * 60 * 200, //  15 minutes
@@ -30,7 +29,6 @@ const limiter=rateLimit({
 })
 
 app.use(limiter)
-
 
 // we use it to provide the attacks accourding header
 app.use(helmet({
@@ -48,23 +46,48 @@ app.use(helmet({
     }
 }))
 console.log(process.env.FRONTEND_BASEUSER)
+app.set("trust proxy", 1);
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://hotel-booking-front-end-x8sw.vercel.app",
-  process.env.FRONTEND_BASEUSER,
+  "https://damainn.com",
+    "https://www.damainn.com",
+    "https://api.damainn.com"
 ];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true); 
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'CORS policy does not allow access from this origin';
-      return callback(new Error(msg), false);
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    // 👉 هنا نطبع علشان نعرف المصدر المرفوض
+    console.log("❌ Blocked CORS request from:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
-  credentials: true
+  credentials: true,
 }));
+
+
+app.use(express.json({ limit: "150mb" }));
+app.use(express.urlencoded({ limit: "150mb", extended: true }));
+
+// app.use(cors({
+//   origin: function(origin, callback) {
+//     if (!origin) return callback(null, true); 
+//     if (allowedOrigins.indexOf(origin) === -1) {
+//       const msg = 'CORS policy does not allow access from this origin';
+//       return callback(new Error(msg), true);
+//     }
+//     return callback(null, true);
+//   },
+//   credentials: true
+// }));
+
+
+
+
 
 app.use(compression());
 

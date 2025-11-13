@@ -3,7 +3,7 @@ import { ISendQuestion } from "../interface/question";
 
 
 
-export async function sendEmailChange(userFounded:{email:string},type:string){
+export async function sendEmailChange(userFounded:{email?:string,restToken?:string},type:string){
     let transporter =nodemailer.createTransport({
     service:"gmail",
     auth: {
@@ -14,7 +14,7 @@ export async function sendEmailChange(userFounded:{email:string},type:string){
     let emailContent;
 
     if(type=== "password"){
-        let resetLink=`${process.env.FRONTEND_BASEUSER}/resetPassword?email=${userFounded.email}`;
+        let resetLink=`${process.env.FRONTEND_BASEUSER}/resetPassword?token=${userFounded.restToken}`;
         emailContent = {
             from: `"Support Team" <${process.env.AUTHEMAIL}>`,
             to: userFounded.email,

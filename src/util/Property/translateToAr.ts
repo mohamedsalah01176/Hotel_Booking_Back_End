@@ -2,9 +2,10 @@ import { IProperty } from "../../interface/property";
 import { parseServicesFromFlatBody } from "../parseServicesFromFlatBody";
 const translate = require("translate-google");
 
-// ✅ mapping ثابت EN → AR
 const provincesMapEnToAr: Record<string, string> = {
   "Rif Dimashq": "ريف دمشق",
+  "Damascus": "دمشق",
+  "Dimashq": "دمشق",
   "Aleppo": "حلب",
   "Latakia": "اللاذقية",
   "Tartus": "طرطوس",
@@ -35,7 +36,7 @@ export const translateToAr = async (body: IProperty): Promise<IProperty> => {
       // ✅ الأول نشوف هل المدينة في الماب؟
       const mappedCityAr = provincesMapEnToAr[city];
 
-      translated.location.cityEn = city === "Rif Dimashq"?"damascus countryside":city;
+      translated.location.cityEn = city === "Rif Dimashq"?"Damascus Countryside":city;
       translated.location.cityAr = mappedCityAr
         ? mappedCityAr
         : await translate(city, { from: "en", to: "ar" });

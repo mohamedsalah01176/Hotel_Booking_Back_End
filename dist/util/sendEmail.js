@@ -32,7 +32,7 @@ function sendEmailChange(userFounded, type) {
         });
         let emailContent;
         if (type === "password") {
-            let resetLink = `${process.env.FRONTEND_BASEUSER}/resetPassword?email=${userFounded.email}`;
+            let resetLink = `${process.env.FRONTEND_BASEUSER}/resetPassword?token=${userFounded.restToken}`;
             emailContent = {
                 from: `"Support Team" <${process.env.AUTHEMAIL}>`,
                 to: userFounded.email,

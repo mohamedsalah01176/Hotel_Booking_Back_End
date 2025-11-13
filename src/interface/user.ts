@@ -6,6 +6,8 @@ export interface IUserBody{
   role:'user' | 'host' | "manager",
   birthDate:Date,
   _id:string,
+  token:string,
+  tokenExpireData:Date,
   image:string,
   phoneVerfy:boolean,
   createdAt:Date
