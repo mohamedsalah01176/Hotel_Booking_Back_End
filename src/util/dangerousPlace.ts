@@ -1,5 +1,7 @@
 export const safeProvincesEn = [
   "Rif Dimashq",
+  "Dimashq",
+  "Damascus",
   "Aleppo",
   "Latakia",
   "Tartus",
@@ -7,6 +9,7 @@ export const safeProvincesEn = [
   "Hama",
   "Homs",
   "Damascus Countryside Governorate",
+  "Damascus Governorate",
   "Aleppo Governorate",
   "Latakia Governorate",
   "Tartus Governorate",
@@ -16,6 +19,7 @@ export const safeProvincesEn = [
 ];
 export const safeProvincesAr = [
   "ريف دمشق",
+  "دمشق",
   "حلب",
   "اللاذقية",
   "طرطوس",
@@ -23,6 +27,7 @@ export const safeProvincesAr = [
   "حماة",
   "حمص",
   "محافظة ريف دمشق",
+  "محافظة دمشق",
   "محافظة حلب",
   "محافظة اللاذقية",
   "محافظة طرطوس",

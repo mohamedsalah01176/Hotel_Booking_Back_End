@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DateSchema = exports.propertySchema = exports.testFunction = exports.forgetPasswordBodySchema = exports.loginBodySchema = exports.regiterBodySchema = void 0;
+exports.DateSchema = exports.propertySchema = exports.testFunction = exports.forgetPasswordBodySchema = exports.ressetPasswordBodySchema = exports.loginBodySchema = exports.regiterBodySchema = void 0;
 const yup = __importStar(require("yup"));
 exports.regiterBodySchema = yup.object({
     name: yup.string().min(3, 'Password must be at least 3 characters').required('Name is required'),
@@ -45,6 +45,10 @@ exports.regiterBodySchema = yup.object({
 });
 exports.loginBodySchema = yup.object({
     emailOrPhone: yup.string().test("email-or-phone", "Invalid Phone Number Or Email", (value) => (0, exports.testFunction)(value)).required('Email is required Or Phone'),
+    password: yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/, 'Password must contain at least one letter and one number').required('Password is required'),
+});
+exports.ressetPasswordBodySchema = yup.object({
+    token: yup.string().required('Token is required '),
     password: yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/, 'Password must contain at least one letter and one number').required('Password is required'),
 });
 exports.forgetPasswordBodySchema = yup.object({

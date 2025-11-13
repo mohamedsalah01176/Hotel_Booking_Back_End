@@ -12,9 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.translateToAr = void 0;
 const parseServicesFromFlatBody_1 = require("../parseServicesFromFlatBody");
 const translate = require("translate-google");
-// ✅ mapping ثابت EN → AR
 const provincesMapEnToAr = {
     "Rif Dimashq": "ريف دمشق",
+    "Damascus": "دمشق",
+    "Dimashq": "دمشق",
     "Aleppo": "حلب",
     "Latakia": "اللاذقية",
     "Tartus": "طرطوس",
@@ -38,7 +39,7 @@ const translateToAr = (body) => __awaiter(void 0, void 0, void 0, function* () {
             const city = body.location.city;
             // ✅ الأول نشوف هل المدينة في الماب؟
             const mappedCityAr = provincesMapEnToAr[city];
-            translated.location.cityEn = city === "Rif Dimashq" ? "damascus countryside" : city;
+            translated.location.cityEn = city === "Rif Dimashq" ? "Damascus Countryside" : city;
             translated.location.cityAr = mappedCityAr
                 ? mappedCityAr
                 : yield translate(city, { from: "en", to: "ar" });

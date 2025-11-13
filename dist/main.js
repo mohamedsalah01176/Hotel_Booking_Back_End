@@ -21,8 +21,6 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 const Port = process.env.PORT;
 const Mongo_URL = process.env.MONGO_URL;
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
 const limiter = (0, express_rate_limit_1.rateLimit)({
     windowMs: 15 * 60 * 200, //  15 minutes
     limit: 1000, // you have 100 request from one ip address at 15 minutes
@@ -45,23 +43,40 @@ app.use((0, helmet_1.default)({
     }
 }));
 console.log(process.env.FRONTEND_BASEUSER);
+app.set("trust proxy", 1);
 const allowedOrigins = [
     "http://localhost:5173",
     "https://hotel-booking-front-end-x8sw.vercel.app",
-    process.env.FRONTEND_BASEUSER,
+    "https://damainn.com",
+    "https://www.damainn.com",
+    "https://api.damainn.com"
 ];
 app.use((0, cors_1.default)({
     origin: function (origin, callback) {
         if (!origin)
             return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'CORS policy does not allow access from this origin';
-            return callback(new Error(msg), false);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
         }
-        return callback(null, true);
+        // 👉 هنا نطبع علشان نعرف المصدر المرفوض
+        console.log("❌ Blocked CORS request from:", origin);
+        return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true
+    credentials: true,
 }));
+app.use(express_1.default.json({ limit: "150mb" }));
+app.use(express_1.default.urlencoded({ limit: "150mb", extended: true }));
+// app.use(cors({
+//   origin: function(origin, callback) {
+//     if (!origin) return callback(null, true); 
+//     if (allowedOrigins.indexOf(origin) === -1) {
+//       const msg = 'CORS policy does not allow access from this origin';
+//       return callback(new Error(msg), true);
+//     }
+//     return callback(null, true);
+//   },
+//   credentials: true
+// }));
 app.use((0, compression_1.default)());
 app.use("/api", user_1.default);
 app.use("/api", property_1.default);

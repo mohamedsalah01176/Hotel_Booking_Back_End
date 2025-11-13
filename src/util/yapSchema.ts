@@ -16,6 +16,10 @@ export const loginBodySchema=yup.object({
   emailOrPhone:yup.string().test("email-or-phone","Invalid Phone Number Or Email",(value)=>testFunction(value as string)).required('Email is required Or Phone'),
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
 })
+export const ressetPasswordBodySchema=yup.object({
+  token:yup.string().required('Token is required '),
+  password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
+})
 export const forgetPasswordBodySchema=yup.object({
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
 })

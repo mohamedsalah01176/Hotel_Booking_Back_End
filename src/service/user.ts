@@ -2,11 +2,11 @@ import { ILoginUser, IUpdateBody, IUserBody } from "../interface/user";
 import bcrypt from "bcrypt"
 import UserModel from "../model/user";
 import { sendMessageSMS, sendMessageWhatsUp } from "../util/sendMessage";
-import {  loginBodySchema, regiterBodySchema } from "../util/yapSchema";
+import {  loginBodySchema, regiterBodySchema, ressetPasswordBodySchema } from "../util/yapSchema";
 import { sendEmailChange, sendEmailCode } from "../util/sendEmail";
 import jwt from "jsonwebtoken";
 import PropertyModel from "../model/property";
-
+import crypto from "crypto"
 
 
 
@@ -214,7 +214,12 @@ export default class UserService{
           messageAr:"الايميل غير مسجل"
         }
       }
-      await sendEmailChange(userFounded,"password")
+      const restToken=await crypto.randomBytes(32).toString("hex");
+      const hashToken=await bcrypt.hash(restToken,parseInt(process.env.SALTPASSWORD as string ));
+      userFounded.token=hashToken;
+      userFounded.tokenExpireData=new Date(Date.now() + 15 * 60 * 1000);
+      await userFounded.save(); 
+      await sendEmailChange({email:userFounded.email,restToken},"password");
       return{
         status:"success",
         messageEn:"Check your gmail account",
@@ -227,28 +232,47 @@ export default class UserService{
       }
     }
   }
-  async handleResetPassword(body:{emailOrPhone:string,password:string}){
-    if(!body){
+  async handleResetPassword(body:{token:string,password:string}){
+    if(!body.token ||!body.password ){
       return{
         status:"fail",
-        messageEn:"Email Not Found",
-        messageAr:"الايميل غير مسجل",
+        message: "Token and new password are required",
+        messageAr: "الرمز وكلمة المرور الجديدة مطلوبان"
       }
     }
-    
     try{
-      let validateBody=await loginBodySchema.validate(body);
-      let foundUser=await UserModel.findOne({email:validateBody.emailOrPhone});
-      if(!foundUser){
+      const user =await UserModel.findOne({
+        token:{ $exists: true },
+        tokenExpireData: {$gt :Date.now()}
+      })
+      if(!user){
         return{
-          status:"fail",
-          messageEn:"Email is not Registered",
-          messageAr:"البريد الإلكتروني غير مسجّل"
-        }
+          status: "fail",
+          message: "Invalid or expired token",
+          messageAr: "الرمز غير صالح أو منتهي الصلاحية"
+        };
       }
-      let bcriptPassword=await bcrypt.hash(body.password,parseInt(process.env.SALTPASSWORD as string ))
-      let updateUser=await UserModel.updateOne({email:validateBody.emailOrPhone},{$set:{password:bcriptPassword}})
-      if(updateUser.modifiedCount){
+      
+      await ressetPasswordBodySchema.validate(body);
+      
+      const isTokenValid=await bcrypt.compare(body.token,user.token);
+      console.log(body.token,"body")
+      console.log(user?.token,"user")
+      if (!isTokenValid) {
+        return {
+          status: "fail",
+          message: "Invalid token",
+          messageAr: "الرمز غير صالح"
+        };
+      }
+      
+      let bcriptPassword=await bcrypt.hash(body.password,parseInt(process.env.SALTPASSWORD as string ));
+
+      user.password=bcriptPassword;
+      user.token="";
+      user.tokenExpireData=new Date(0);
+      const updateUser=await user.save();
+      if(updateUser){
         return{
           status:"success",
           messageEn:"Password Updated",

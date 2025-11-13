@@ -13,6 +13,7 @@ exports.translateToEn = void 0;
 const parseServicesFromFlatBody_1 = require("../parseServicesFromFlatBody");
 const translate = require("translate-google");
 const provincesMapArToEn = {
+    "دمشق": "Damascus",
     "ريف دمشق": "Damascus Countryside",
     "حلب": "Aleppo",
     "اللاذقية": "Latakia",
