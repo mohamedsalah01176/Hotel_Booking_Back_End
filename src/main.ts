@@ -22,14 +22,6 @@ const Mongo_URL=process.env.MONGO_URL as string;
 app.set("trust proxy", 1);
 
 
-const limiter=rateLimit({
-     windowMs:15 * 60 * 200, //  15 minutes
-     limit:1000, // you have 100 request from one ip address at 15 minutes
-    message:"Too many requests, please try again later"
-})
-
-app.use(limiter)
-
 // we use it to provide the attacks accourding header
 // app.use(helmet({
 //     // to solve show image problem
@@ -77,8 +69,22 @@ app.use(cors({
 
 app.options(/.*/, cors());
 
+
 app.use(express.json({ limit: "150mb" }));
 app.use(express.urlencoded({ limit: "150mb", extended: true }));
+
+
+const limiter=rateLimit({
+     windowMs:15 * 60 * 200, //  15 minutes
+     limit:1000, // you have 100 request from one ip address at 15 minutes
+    message:"Too many requests, please try again later"
+})
+
+app.use(limiter)
+
+
+
+
 
 app.use((req, res, next) => {
   console.log("Method:", req.method);
