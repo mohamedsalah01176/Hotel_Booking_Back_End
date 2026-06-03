@@ -31,44 +31,51 @@ const limiter=rateLimit({
 app.use(limiter)
 
 // we use it to provide the attacks accourding header
-app.use(helmet({
-    // to solve show image problem
-    contentSecurityPolicy:{
-        directives:{
-            "default-src": ["'self'"],
-            "script-src": ["'self'", "'unsafe-inline'"],  
-            // "img-src":["'self'","https://cdn.dummyjson.com"]
-        }
-    },
-    // to provide attecker to write iframe in page
-    xFrameOptions:{
-        action:"deny"
-    }
-}))
-console.log(process.env.FRONTEND_BASEUSER)
-app.set("trust proxy", 1);
+// app.use(helmet({
+//     // to solve show image problem
+//     contentSecurityPolicy:{
+//         directives:{
+//             "default-src": ["'self'"],
+//             "script-src": ["'self'", "'unsafe-inline'"],  
+//             // "img-src":["'self'","https://cdn.dummyjson.com"]
+//         }
+//     },
+//     // to provide attecker to write iframe in page
+//     xFrameOptions:{
+//         action:"deny"
+//     }
+// }))
+// console.log(process.env.FRONTEND_BASEUSER)
+// app.set("trust proxy", 1);
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://hotel-booking-front-end-x8sw.vercel.app",
-  "https://damainn.com",
-    "https://www.damainn.com",
-    "https://api.damainn.com",
-    "https://hotel-booking-front-end-hhqs.vercel.app"
-];
+// const allowedOrigins = [
+//   "http://localhost:5173",
+//   "https://hotel-booking-front-end-x8sw.vercel.app",
+//   "https://damainn.com",
+//     "https://www.damainn.com",
+//     "https://api.damainn.com",
+//     "https://hotel-booking-front-end-hhqs.vercel.app"
+// ];
+
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin) return callback(null, true);
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
+//     // 👉 هنا نطبع علشان نعرف المصدر المرفوض
+//     console.log("❌ Blocked CORS request from:", origin);
+//     return callback(new Error("Not allowed by CORS"));
+//   },
+//   credentials: true,
+// }));
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    // 👉 هنا نطبع علشان نعرف المصدر المرفوض
-    console.log("❌ Blocked CORS request from:", origin);
-    return callback(new Error("Not allowed by CORS"));
-  },
+  origin: true,
   credentials: true,
 }));
+
+app.options("*", cors());
 
 
 app.use(express.json({ limit: "150mb" }));
