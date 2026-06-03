@@ -64,8 +64,13 @@ class PropertyService {
             const skip = (pageNumber - 1) * limit || 0;
             console.log(cityEn);
             try {
-                const allproperties = yield property_1.default.find({ isActive: true, "location.cityEn": cityEn.toLowerCase() });
-                const properties = yield property_1.default.find({ isActive: true, "location.cityEn": cityEn.toLowerCase() }).sort({ ordersNumbers: -1 }).skip(skip).limit(limit);
+                const allproperties = yield property_1.default.find({ isActive: true, "location.cityEn": {
+                        $regex: new RegExp(`^${cityEn}$`, "i"),
+                    } });
+                const properties = yield property_1.default.find({ isActive: true, "location.cityEn": {
+                        $regex: new RegExp(`^${cityEn}$`, "i"),
+                    } }).sort({ ordersNumbers: -1 }).skip(skip).limit(limit);
+                console.log("propertiesaaaaa", allproperties);
                 return {
                     status: "success",
                     properties,

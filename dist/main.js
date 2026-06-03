@@ -58,7 +58,7 @@ app.set("trust proxy", 1);
 //   },
 //   credentials: true,
 // }));
-app.use((0, cors_1.default)({ 
+app.use((0, cors_1.default)({
     origin: true,
     credentials: true,
 }));
