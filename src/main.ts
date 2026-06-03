@@ -19,7 +19,59 @@ dotenv.config();
 const app =express();
 const Port=process.env.PORT;
 const Mongo_URL=process.env.MONGO_URL as string;
+app.set("trust proxy", 1);
 
+
+// we use it to provide the attacks accourding header
+// app.use(helmet({
+//     // to solve show image problem
+//     contentSecurityPolicy:{
+//         directives:{
+//             "default-src": ["'self'"],
+//             "script-src": ["'self'", "'unsafe-inline'"],  
+//             // "img-src":["'self'","https://cdn.dummyjson.com"]
+//         }
+//     },
+//     // to provide attecker to write iframe in page
+//     xFrameOptions:{
+//         action:"deny"
+//     }
+// }))
+// console.log(process.env.FRONTEND_BASEUSER)
+// app.set("trust proxy", 1);
+
+// const allowedOrigins = [
+//   "http://localhost:5173",
+//   "https://hotel-booking-front-end-x8sw.vercel.app",
+//   "https://damainn.com",
+//     "https://www.damainn.com",
+//     "https://api.damainn.com",
+//     "https://hotel-booking-front-end-hhqs.vercel.app"
+// ];
+
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin) return callback(null, true);
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
+//     // 👉 هنا نطبع علشان نعرف المصدر المرفوض
+//     console.log("❌ Blocked CORS request from:", origin);
+//     return callback(new Error("Not allowed by CORS"));
+//   },
+//   credentials: true,
+// }));
+
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
+
+app.options(/.*/, cors());
+
+
+app.use(express.json({ limit: "150mb" }));
+app.use(express.urlencoded({ limit: "150mb", extended: true }));
 
 
 const limiter=rateLimit({
@@ -30,49 +82,16 @@ const limiter=rateLimit({
 
 app.use(limiter)
 
-// we use it to provide the attacks accourding header
-app.use(helmet({
-    // to solve show image problem
-    contentSecurityPolicy:{
-        directives:{
-            "default-src": ["'self'"],
-            "script-src": ["'self'", "'unsafe-inline'"],  
-            // "img-src":["'self'","https://cdn.dummyjson.com"]
-        }
-    },
-    // to provide attecker to write iframe in page
-    xFrameOptions:{
-        action:"deny"
-    }
-}))
-console.log(process.env.FRONTEND_BASEUSER)
-app.set("trust proxy", 1);
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://hotel-booking-front-end-x8sw.vercel.app",
-  "https://damainn.com",
-    "https://www.damainn.com",
-    "https://api.damainn.com"
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    // 👉 هنا نطبع علشان نعرف المصدر المرفوض
-    console.log("❌ Blocked CORS request from:", origin);
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-}));
 
 
-app.use(express.json({ limit: "150mb" }));
-app.use(express.urlencoded({ limit: "150mb", extended: true }));
 
+
+app.use((req, res, next) => {
+  console.log("Method:", req.method);
+  console.log("Origin:", req.headers.origin);
+  console.log("URL:", req.originalUrl);
+  next();
+});
 // app.use(cors({
 //   origin: function(origin, callback) {
 //     if (!origin) return callback(null, true); 
@@ -127,3 +146,5 @@ app.use((req:Request,res:Response)=>{
 mongoose.connect(Mongo_URL).then(()=>console.log("databse connected"))
 
 app.listen(Port,()=>console.log(`http://localhost:${Port}`))
+
+export default app;
