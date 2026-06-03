@@ -140,3 +140,5 @@ app.use((req:Request,res:Response)=>{
 mongoose.connect(Mongo_URL).then(()=>console.log("databse connected"))
 
 app.listen(Port,()=>console.log(`http://localhost:${Port}`))
+
+export default app;
