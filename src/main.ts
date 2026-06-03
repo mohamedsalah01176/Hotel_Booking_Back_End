@@ -19,7 +19,7 @@ dotenv.config();
 const app =express();
 const Port=process.env.PORT;
 const Mongo_URL=process.env.MONGO_URL as string;
-
+app.set("trust proxy", 1);
 
 
 const limiter=rateLimit({
