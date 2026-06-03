@@ -53,7 +53,8 @@ const allowedOrigins = [
   "https://hotel-booking-front-end-x8sw.vercel.app",
   "https://damainn.com",
     "https://www.damainn.com",
-    "https://api.damainn.com"
+    "https://api.damainn.com",
+    "https://hotel-booking-front-end-hhqs.vercel.app"
 ];
 
 app.use(cors({
