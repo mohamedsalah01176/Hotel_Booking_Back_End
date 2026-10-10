@@ -81,7 +81,6 @@ export async function sendEmailChange(userFounded:{email?:string,restToken?:stri
         };
     }
     if(type === "question"){
-        console.log("cccccccccccccccccc")
         const data=userFounded as ISendQuestion
         emailContent = {
         from: `"Question From" <${data.email }>`,
@@ -191,7 +190,6 @@ export async function sendEmailCode(code: number, userEmail:string) {
         };
         if(emailContent){
             const res=await transporter.sendMail(emailContent);
-            console.log(res)
         }
 }
 
@@ -279,7 +277,7 @@ export async function sendEmailCreatedProperty(propertyName: string, userEmail:s
         };
         if(emailContent){
             const res=await transporter.sendMail(emailContent);
-            console.log(res)
+            
         }
 }
 
@@ -368,7 +366,7 @@ export async function sendEmailActivatedProperty(propertyName: string, userEmail
     };
     if(emailContent){
         const res=await transporter.sendMail(emailContent);
-        console.log(res)
+        
     }
 }
 
@@ -455,7 +453,7 @@ export async function sendEmailDeactivatedProperty(propertyName: string, userEma
 
     if(emailContent){
         const res=await transporter.sendMail(emailContent);
-        console.log(res)
+        
     }
 }
 
@@ -539,7 +537,7 @@ export async function sendEmailManagerDeletedProperty(propertyName: string, user
     };
     if(emailContent){
         const res=await transporter.sendMail(emailContent);
-        console.log(res)
+        
     }
 }
 
@@ -626,7 +624,7 @@ export async function sendReservationEmailForUser(propertyName:string,userEmail:
     
         if(emailContenet){
             let res=await trannsport.sendMail(emailContenet)
-            console.log(res)
+            
         }
 }
 
@@ -712,6 +710,6 @@ export async function sendEmailReservationCancelled(propertyName: string, userEm
     }
     if(emailContent){
         const res=await transporter.sendMail(emailContent);
-        console.log(res)
+        
     }
 }

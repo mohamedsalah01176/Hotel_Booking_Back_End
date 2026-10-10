@@ -20,9 +20,7 @@ export default class CityService{
 
   async handleDeleteCities(cityName:string){
     try{
-      console.log(cityName)
       const cities=await CityModel.deleteOne({nameEn:cityName});
-      console.log(cities)
       if(cities.deletedCount>0){
         await PropertyModel.deleteMany({"location.cityEn":cityName});
         return{

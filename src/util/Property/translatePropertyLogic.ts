@@ -31,11 +31,9 @@ export const translateToEnLogic =async (body:IProperty,adminBody:IUserPayload)=>
   }
 }
 export const translateToArLogic =async (body:IProperty,adminBody:IUserPayload)=>{
-  console.log(body.location.city,"sssssssssssss")
   const translatedBody= await translateToAr(body);
   
   const isSafePlace= safeProvincesEn.some(item=>item.toLowerCase() ===body.location.city?.toLowerCase())
-  console.log(isSafePlace,"sssssssssssss")
   const foundProperty= await PropertyModel.findOne({"admin._id":adminBody?._id})
   let newProperty;
   if(foundProperty && foundProperty.isConfirmed === true){

@@ -12,9 +12,10 @@ const Schema = new mongoose_1.default.Schema({
     },
     phone: {
         type: String,
-        required: true,
-        match: [/^\+?[1-9]\d{6,14}$/, 'Invalid email format'],
-        unique: true
+        required: false,
+        unique: true,
+        sparse: true,
+        match: [/^\+?[1-9]\d{6,14}$/, "Invalid phone format"],
     },
     role: {
         type: String,
@@ -32,11 +33,13 @@ const Schema = new mongoose_1.default.Schema({
         lowercase: true,
         match: [/^\S+@\S+\.\S+$/, 'Invalid email format']
     },
+    providerId: {
+        type: String,
+    },
     password: {
         type: String,
-        required: true,
+        required: false,
         minlength: 8,
-        match: [/(?=.*[a-zA-Z])(?=.*\d)/, 'Password must contain at least one letter and one number']
     },
     phoneVerfy: {
         type: Boolean,

@@ -168,12 +168,18 @@ class UserService {
                 else {
                     foundUser = yield user_1.default.findOne({ email: validateBody.emailOrPhone });
                 }
-                console.log(foundUser);
                 if (!foundUser) {
                     return {
                         status: "fail",
                         messageEn: "Email Or Phone Not Registered",
                         messageAr: "الايميل غير مسجل"
+                    };
+                }
+                if (!foundUser.password) {
+                    return {
+                        status: "fail",
+                        messageEn: "This account is registered via social login",
+                        messageAr: "هذا الحساب مسجل عبر تسجيل الدخول الاجتماعي"
                     };
                 }
                 let matchedPassword = yield bcrypt_1.default.compare(validateBody.password, foundUser.password);
@@ -188,8 +194,6 @@ class UserService {
                     createdAt: foundUser.createdAt
                 };
                 let token = jsonwebtoken_1.default.sign(payload, process.env.SECTERTOKENKEY, { expiresIn: "30d" });
-                console.log(validateBody.password);
-                console.log(matchedPassword);
                 if (matchedPassword) {
                     return {
                         status: "success",
@@ -205,6 +209,82 @@ class UserService {
                         messageAr: "كلمه السر غير صحيحيه",
                     };
                 }
+            }
+            catch (errors) {
+                return {
+                    status: "error",
+                    errors
+                };
+            }
+        });
+    }
+    handleSocailLogin(body) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!body) {
+                return {
+                    status: "fail",
+                    messageEn: "Socail Login Data is required",
+                    messageAr: "يجب ادخال بيانات تسجيل الدخول الاجتماعي",
+                };
+            }
+            if (body.role && body.role !== "user") {
+                return {
+                    status: "fail",
+                    messageEn: "User Role Not Allowed To Socail Login",
+                    messageAr: "دور المستخدم غير مسموح به في تسجيل الدخول الاجتماعي",
+                };
+            }
+            try {
+                const validateBody = yield yapSchema_1.socailLoginBodySchema.validate(body, { abortEarly: false });
+                let foundUser = yield user_1.default.findOne({ email: validateBody.email });
+                if (foundUser) {
+                    if (foundUser.role !== "user") {
+                        return {
+                            status: "fail",
+                            messageEn: "User Role Not Allowed To Socail Login",
+                            messageAr: "دور المستخدم غير مسموح به في تسجيل الدخول الاجتماعي",
+                        };
+                    }
+                    let shouldSave = false;
+                    if (!foundUser.providerId && validateBody.providerId) {
+                        foundUser.providerId = validateBody.providerId;
+                        shouldSave = true;
+                    }
+                    if (!foundUser.image && validateBody.image) {
+                        foundUser.image = validateBody.image;
+                        shouldSave = true;
+                    }
+                    if (shouldSave) {
+                        yield foundUser.save();
+                    }
+                }
+                else {
+                    foundUser = yield user_1.default.create({
+                        name: validateBody.name,
+                        email: validateBody.email,
+                        role: "user",
+                        providerId: validateBody.providerId,
+                        image: validateBody.image || null,
+                        phoneVerfy: false
+                    });
+                }
+                const payload = {
+                    _id: foundUser._id,
+                    name: foundUser.name,
+                    email: foundUser.email,
+                    phone: foundUser.phone,
+                    role: foundUser.role,
+                    image: foundUser === null || foundUser === void 0 ? void 0 : foundUser.image,
+                    phoneVerfy: foundUser === null || foundUser === void 0 ? void 0 : foundUser.phoneVerfy,
+                    createdAt: foundUser.createdAt
+                };
+                let token = jsonwebtoken_1.default.sign(payload, process.env.SECTERTOKENKEY, { expiresIn: "30d" });
+                return {
+                    status: "success",
+                    messageEn: "Welcame in Our WebSite",
+                    messageAr: "مرحبا بك في موقعنا",
+                    token
+                };
             }
             catch (errors) {
                 return {

@@ -28,7 +28,6 @@ export const authentication =(req:Request,res:Response,next:NextFunction)=>{
   
   try{
     const decoded = jwt.verify(token, process.env.SECTERTOKENKEY as string) as JwtPayload;
-    console.log(decoded)
     req.user = decoded;
     next()
   }catch (error) {
@@ -45,7 +44,6 @@ export const authorizationForHost=(req:Request,res:Response,next:NextFunction)=>
   let token = authHearder.split(" ")[1];
   try{
     const decod =jwt.verify(token,process.env.SECTERTOKENKEY as string) as JwtPayload
-    console.log(decod)
     if(decod.role == "host"){
       next();
     }else{
@@ -64,7 +62,6 @@ export const authorizationForUser=(req:Request,res:Response,next:NextFunction)=>
   let token = authHearder.split(" ")[1];
   try{
     const decod =jwt.verify(token,process.env.SECTERTOKENKEY as string) as JwtPayload
-    console.log(decod)
     if(decod.role == "user"){
       next();
     }else{
@@ -82,7 +79,6 @@ export const authorizationForManager=(req:Request,res:Response,next:NextFunction
   let token = authHearder.split(" ")[1];
   try{
     const decod =jwt.verify(token,process.env.SECTERTOKENKEY as string) as JwtPayload
-    console.log(decod)
     if(decod.role == "manager"){
       next();
     }else{

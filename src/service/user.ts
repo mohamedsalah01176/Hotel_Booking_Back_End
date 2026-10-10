@@ -1,8 +1,8 @@
-import { ILoginUser, IUpdateBody, IUserBody } from "../interface/user";
+import { ILoginUser, ISocailUserPayload, IUpdateBody, IUserBody } from "../interface/user";
 import bcrypt from "bcrypt"
 import UserModel from "../model/user";
 import { sendMessageSMS, sendMessageWhatsUp } from "../util/sendMessage";
-import {  loginBodySchema, regiterBodySchema, ressetPasswordBodySchema } from "../util/yapSchema";
+import {  loginBodySchema, regiterBodySchema, ressetPasswordBodySchema, socailLoginBodySchema } from "../util/yapSchema";
 import { sendEmailChange, sendEmailCode } from "../util/sendEmail";
 import jwt from "jsonwebtoken";
 import PropertyModel from "../model/property";
@@ -23,7 +23,6 @@ export default class UserService{
       }
     }
     try{
-      console.log(body,"body")
       let code=Math.floor(100000+Math.random()*900000);
       otpStore[body.email]=code.toString();
       sendEmailCode(code,body.email as string)
@@ -108,7 +107,6 @@ export default class UserService{
       }
       
       const validationBody=regiterBodySchema.validate(body,{abortEarly:false});
-      console.log((await validationBody).password as string)
       let bcriptPassword=await bcrypt.hash((await validationBody).password as string ,parseInt(process.env.SALTPASSWORD as string));
       let newUser=new UserModel({...(await validationBody),password:bcriptPassword});
       await newUser.save();
@@ -153,12 +151,18 @@ export default class UserService{
       }else{
         foundUser=await UserModel.findOne({email:validateBody.emailOrPhone});
       }
-      console.log(foundUser)
       if(!foundUser){
         return{
           status:"fail",
           messageEn:"Email Or Phone Not Registered",
           messageAr:"الايميل غير مسجل"
+        }
+      }
+      if(!foundUser.password){
+        return{
+          status:"fail",
+          messageEn:"This account is registered via social login",
+          messageAr:"هذا الحساب مسجل عبر تسجيل الدخول الاجتماعي"
         }
       }
       let matchedPassword=await bcrypt.compare(validateBody.password,foundUser.password);
@@ -173,8 +177,6 @@ export default class UserService{
         createdAt:foundUser.createdAt
       };
       let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
-      console.log(validateBody.password);
-      console.log(matchedPassword);
       if(matchedPassword){
         return{
           status:"success",
@@ -189,6 +191,79 @@ export default class UserService{
           messageAr:"كلمه السر غير صحيحيه",
         }
       }
+    }catch(errors){
+      return{
+        status:"error",
+        errors
+      }
+    }
+  }
+  async handleSocailLogin(body:ISocailUserPayload){
+    if(!body){
+      return{
+        status:"fail",
+        messageEn:"Socail Login Data is required",
+        messageAr:"يجب ادخال بيانات تسجيل الدخول الاجتماعي",
+      }
+    }
+    if(body.role && body.role !=="user"){
+      return{
+        status:"fail",
+        messageEn:"User Role Not Allowed To Socail Login",
+        messageAr:"دور المستخدم غير مسموح به في تسجيل الدخول الاجتماعي",
+      }
+    }
+    try{
+      const validateBody=await socailLoginBodySchema.validate(body,{abortEarly:false});
+      let foundUser = await UserModel.findOne({email:validateBody.email});
+      if(foundUser){
+        if(foundUser.role !== "user"){
+          return{
+            status:"fail",
+            messageEn:"User Role Not Allowed To Socail Login",
+            messageAr:"دور المستخدم غير مسموح به في تسجيل الدخول الاجتماعي",
+          }
+        }
+        let shouldSave = false;
+        if(!foundUser.providerId && validateBody.providerId){
+          foundUser.providerId = validateBody.providerId;
+          shouldSave = true;
+        }
+        if(!foundUser.image && validateBody.image){
+          foundUser.image = validateBody.image;
+          shouldSave = true;
+        }
+        if(shouldSave){
+          await foundUser.save();
+        }
+      }else{
+        foundUser = await UserModel.create({
+          name:validateBody.name,
+          email:validateBody.email,
+          role:"user",
+          providerId:validateBody.providerId,
+          image:validateBody.image || null,
+          phoneVerfy:true
+        });
+      }
+      const payload = {
+        _id: foundUser._id,
+        name: foundUser.name,
+        email: foundUser.email,
+        phone: foundUser.phone,
+        role: foundUser.role,
+        image: foundUser?.image,
+        phoneVerfy: foundUser?.phoneVerfy,
+        createdAt: foundUser.createdAt
+      };
+      let token=  jwt.sign(payload,process.env.SECTERTOKENKEY as string,{expiresIn:"30d"});
+      return{
+        status:"success",
+        messageEn:"Welcame in Our WebSite",
+        messageAr:"مرحبا بك في موقعنا",
+        token
+      }
+
     }catch(errors){
       return{
         status:"error",
@@ -256,8 +331,6 @@ export default class UserService{
       await ressetPasswordBodySchema.validate(body);
       
       const isTokenValid=await bcrypt.compare(body.token,user.token);
-      console.log(body.token,"body")
-      console.log(user?.token,"user")
       if (!isTokenValid) {
         return {
           status: "fail",
@@ -320,7 +393,6 @@ export default class UserService{
       }
       if(body.oldPassword){
         const checkedPassword=await bcrypt.compare(body?.oldPassword as string,user?.password as string);
-        console.log(checkedPassword,"lllllllllll")
         if(!checkedPassword){
           return{
             status:"fail",
@@ -330,7 +402,6 @@ export default class UserService{
         }
         hashPassword=await bcrypt.hash(body?.newPassword as string,Number(process.env.SALTPASSWORD));
       }
-      console.log(body,"llllllllllllllllll")
       body.password=hashPassword;
       delete body.newPassword
       delete body.oldPassword
@@ -364,7 +435,6 @@ export default class UserService{
           users
         }
     }catch(errors){
-      console.log(errors)
       return{
         status:"error",
         errors
@@ -389,7 +459,6 @@ export default class UserService{
         }
       }
     }catch(errors){
-      console.log(errors)
       return{
         status:"error",
         errors

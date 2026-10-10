@@ -12,7 +12,6 @@ export default class ReviewServices{
     try{
       let propertyUpdated : UpdateResult ;
       if(lang === "en"){
-        console.log(lang)
         const translaedBody=await translateToAr(body)
         propertyUpdated=await PropertyModel.updateOne({_id:propertyId},{$push:{reviews:{...translaedBody,user:user}}});
       }else{

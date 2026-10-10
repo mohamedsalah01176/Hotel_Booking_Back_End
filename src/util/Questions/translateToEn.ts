@@ -14,7 +14,6 @@ export const translateToEn = async (body: IQuestionBody ): Promise<IQuestion> =>
       translated.answerAr = body.answer;
       translated.answerEn = await translate(body.answer, { from: "ar", to: "en" });
     }
-    console.log(translated)
     return translated;
   } catch (err) {
     console.error("❌ Translation Error:", err);

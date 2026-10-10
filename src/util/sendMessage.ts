@@ -20,8 +20,6 @@ export async function sendMessageSMS(code: number, userPhone: string) {
     const response = await axios.post(url, payload, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
-    console.log('Message sent successfully');
-    console.log(response.data);
     return { status: 'success' };
   } catch (err) {
     console.error('There was an error sending the messages.');
@@ -32,9 +30,6 @@ export async function sendMessageSMS(code: number, userPhone: string) {
 
 
 // export async function sendMessageSMS(code: number, userPhone: string) {
-//   console.log(process.env.VONAGE_API_KEY)
-//   console.log(process.env.VONAGE_API_SECRET)
-//   console.log(process.env.VONAGE_API_PHONE)
 //   try {
 //     const from = "Vonage APIs"
 //     const to = "4368864870135"
@@ -56,7 +51,6 @@ export async function sendMessageSMS(code: number, userPhone: string) {
 //     //   from: process.env.TWILIO_PHONE_NUMBER,
 //     //   to: userPhone,
 //     // });
-//     // console.log("✅ SMS sent via Twilio:", message);
 
 //     return { status: "success", resp };
 //   } catch (errors) {
@@ -83,17 +77,14 @@ export async function sendMessageWhatsUp(code: number, userPhone: string) {
 
   try {
     const response = await axios.post(url, data, { headers });
-    console.log('WhatsApp message sent:', response.data);
 
   } catch (error: any) {
-    console.error("❌ Twilio error:", error?.message || error);
     return { status: "error", error };
   }
 
 }
 // export async function sendMessageWhatsUp(code: number, userPhone: string) {
 //   const client=twilio(process.env.TWILIO_ACCOUNT_SID , process.env.TWILIO_AUTH_TOKEN  );
-//   console.log("➡️ Starting WhatsApp send…");
 
 //   try {
 //     const message = await client.messages.create({
@@ -102,11 +93,9 @@ export async function sendMessageWhatsUp(code: number, userPhone: string) {
 //       to:   `whatsapp:${userPhone}`
 //     });
 
-//     console.log("✅ Sent! SID:", message.sid); // سيظهر هذا عند النجاح
 //     return { status: "success", sid: message.sid };
 
 //   } catch (error: any) {
-//     console.error("❌ Twilio error:", error?.message || error);
 //     return { status: "error", error };
 //   }
 // }

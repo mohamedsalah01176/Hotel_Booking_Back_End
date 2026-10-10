@@ -42,6 +42,13 @@ class UserControler {
             (0, ResponseStatus_1.ReponseStatues)(responseServer, res);
         });
     }
+    socailLogin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            let responseServer = yield this.userService.handleSocailLogin(body);
+            (0, ResponseStatus_1.ReponseStatues)(responseServer, res);
+        });
+    }
     forgetPassword(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const body = req.body;

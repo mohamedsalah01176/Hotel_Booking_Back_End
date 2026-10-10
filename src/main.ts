@@ -37,7 +37,6 @@ app.set("trust proxy", 1);
 //         action:"deny"
 //     }
 // }))
-// console.log(process.env.FRONTEND_BASEUSER)
 // app.set("trust proxy", 1);
 
 // const allowedOrigins = [
@@ -87,9 +86,6 @@ app.use(limiter)
 
 
 app.use((req, res, next) => {
-  console.log("Method:", req.method);
-  console.log("Origin:", req.headers.origin);
-  console.log("URL:", req.originalUrl);
   next();
 });
 // app.use(cors({

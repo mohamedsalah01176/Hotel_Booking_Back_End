@@ -6,7 +6,6 @@ import { DateSchema } from "../util/yapSchema";
 
 export default class ReservDatesService{
   async handleRevesveDates(user:IUserPayload,body:{startDate:Date,endDate:Date},propertyId:string){
-    console.log("kkkkkkkkkkkkkkkkkkkkk")
     try{
       await DateSchema.validate(body);
       const property=await PropertyModel.findOne({_id:propertyId});
@@ -58,7 +57,6 @@ export default class ReservDatesService{
     }
   }
   async handleGetReserveDateForUser(userId:string){
-    console.log(userId)
     try{
       const foundHotels = await ReserveDateModel.find({ "reserveDates.userId": userId });
       if (foundHotels.length > 0) {

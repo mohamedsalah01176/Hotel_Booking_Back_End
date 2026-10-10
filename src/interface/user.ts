@@ -1,15 +1,16 @@
 export interface IUserBody{
   name:string,
-  phone:string,
+  phone?:string,
   email:string,
-  password:string,
-  role:'user' | 'host' | "manager",
-  birthDate:Date,
+  password?:string,
+  role:"user" | "host" | "manager",
+  birthDate?:Date,
   _id:string,
-  token:string,
-  tokenExpireData:Date,
-  image:string,
+  token?:string,
+  tokenExpireData?:Date,
+  image?:string,
   phoneVerfy:boolean,
+  providerId?:string,
   createdAt:Date
 }
 export interface IUpdateBody{
@@ -38,4 +39,12 @@ export interface IUserPayload {
   phone?: string;
   createdAt:Date;
   phoneVerfy:boolean;
+}
+
+export interface ISocailUserPayload{
+  name:string;
+  email:string;
+  role?: "user";
+  providerId:string;
+  image?:string;
 }

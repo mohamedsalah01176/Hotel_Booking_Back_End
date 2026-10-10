@@ -10,7 +10,6 @@ export default class CommonQuestionsServices{
   async handleAllQuestions(){
     try{
       const questions= await QuestionsModel.find({});
-      console.log(questions)
       return{
         status:"success",
         questions

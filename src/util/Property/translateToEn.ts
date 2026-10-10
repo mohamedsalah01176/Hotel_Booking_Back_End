@@ -72,7 +72,6 @@ export const translateToEn = async (body: IProperty): Promise<IProperty> => {
       }
     }
 
-    console.log(translatedBody);
     return translatedBody;
   } catch (err) {
     console.error("❌ Translation Error:", err);

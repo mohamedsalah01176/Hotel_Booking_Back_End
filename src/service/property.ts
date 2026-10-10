@@ -13,7 +13,6 @@ export class PropertyService{
   async handleAllProperties(){
     try{
       const properties=await PropertyModel.find({});
-      console.log(properties)
       return{
         status:"success",
         properties
@@ -28,7 +27,6 @@ export class PropertyService{
   async handleAllActiveProperties(limit:number){
     try{
       const properties=await PropertyModel.find({isActive:true}).sort({ordersNumbers:-1}).limit(limit);
-      console.log(properties)
       return{
         status:"success",
         properties
@@ -41,10 +39,7 @@ export class PropertyService{
     }
   }
   async handleAllActivePropertiesForCity(cityEn:string,pageNumber:number,limit:number){
-    console.log(limit)
-    console.log(pageNumber)
     const skip=(pageNumber-1)*limit || 0;
-    console.log(cityEn)
     try{
       const allproperties=await PropertyModel.find({isActive:true,"location.cityEn":{
         $regex: new RegExp(`^${cityEn}$`, "i"),
@@ -52,7 +47,6 @@ export class PropertyService{
       const properties=await PropertyModel.find({isActive:true,"location.cityEn":{
         $regex: new RegExp(`^${cityEn}$`, "i"),
       }}).sort({ordersNumbers:-1}).skip(skip).limit(limit);
-      console.log("propertiesaaaaa",allproperties)
       return{
         status:"success",
         properties,
@@ -108,21 +102,18 @@ export class PropertyService{
       body.electricityAndWater.publicWater = Number(body.electricityAndWater.publicWater);  
       body.electricityAndWater.privateWell = Number(body.electricityAndWater.privateWell);  
       body.electricityAndWater.waterTank = Number(body.electricityAndWater.waterTank);  
-      console.log(body);
       const validbody=await propertySchema.validate(body,{abortEarly:false});
       if(lang === "ar"){
         await translateToEnLogic(body,adminBody)
       }else{
         await translateToArLogic(body,adminBody)
       }
-      console.log("success");
       return{
         status:"success",
         message: "Your property has been submitted and is waiting for manager review."
       }
       
     }catch(errors){
-      console.log("error",errors);
       return{
         status:"error",
         errors,
@@ -130,7 +121,6 @@ export class PropertyService{
     }
   }
   async handleGetPropertyForAdmin(adminBody:IUserPayload){
-    console.log(adminBody)
     if(adminBody.role === "user"){
       return {
         status:"fail",

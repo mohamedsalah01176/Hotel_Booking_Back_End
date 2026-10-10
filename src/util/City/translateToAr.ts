@@ -10,10 +10,8 @@ export const translateToAr = async (body: {name:string} ): Promise<{nameEn:strin
       translated.nameEn = body.name;
       translated.nameAr = await translate(body.name.trim(), { from: "en", to: "ar" });
     }
-    console.log(translated)
     return translated;
   } catch (err) {
-    console.error("❌ Translation Error:", err);
     return translated;
   }
 };

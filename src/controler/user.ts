@@ -33,6 +33,12 @@ export default class UserControler{
     let responseServer=await this.userService.handleLogin(body);
     ReponseStatues(responseServer,res)  
   }
+
+  async socailLogin(req:Request,res:Response){
+    const body=req.body;
+    let responseServer=await this.userService.handleSocailLogin(body);
+    ReponseStatues(responseServer,res)  
+  }
   
   async forgetPassword(req:Request,res:Response){
     const body=req.body;

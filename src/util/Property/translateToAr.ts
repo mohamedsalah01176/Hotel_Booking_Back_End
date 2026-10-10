@@ -70,8 +70,6 @@ export const translateToAr = async (body: IProperty): Promise<IProperty> => {
       }
     }
 
-    console.log(body, "before");
-    console.log(translated, "after");
     return translated;
   } catch (err) {
     console.error("❌ Translation Error:", err);

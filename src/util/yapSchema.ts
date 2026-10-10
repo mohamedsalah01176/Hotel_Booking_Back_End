@@ -16,6 +16,15 @@ export const loginBodySchema=yup.object({
   emailOrPhone:yup.string().test("email-or-phone","Invalid Phone Number Or Email",(value)=>testFunction(value as string)).required('Email is required Or Phone'),
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
 })
+
+export const socailLoginBodySchema=yup.object({
+  name:yup.string().required("Name is required"),
+  email:yup.string().email("Email Not Valid").required("Email is required"),
+  role: yup.string().oneOf(["user"],"Social login is allowed for user role only").optional().default("user"),
+  providerId:yup.string().required("Provider ID is required"),
+  image:yup.string().optional()
+})
+
 export const ressetPasswordBodySchema=yup.object({
   token:yup.string().required('Token is required '),
   password:yup.string().matches(/^(?=.*[a-zA-Z])(?=.*\d)/,'Password must contain at least one letter and one number').required('Password is required'),
