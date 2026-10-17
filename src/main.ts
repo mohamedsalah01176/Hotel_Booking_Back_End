@@ -10,10 +10,14 @@ import propertyRouter from "./route/property";
 import cityRouter from "./route/city";
 import reviewRouter from "./route/review";
 import reservRouter from "./route/reservDates";
+import paypalRouter from "./route/paypal";
+import stripeRoutes from "./route/stripe"
 import CommonQuestionsRouter from "./route/commonQuestions";
 import dashboardRouter from "./route/dashboard";
+import StripeController from "./controler/stripe";
 
 
+const stripeController = new StripeController();
 
 dotenv.config();
 const app =express();
@@ -68,6 +72,11 @@ app.use(cors({
 
 app.options(/.*/, cors());
 
+app.post(
+  "/api/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => stripeController.webhook(req, res)
+);
 
 app.use(express.json({ limit: "150mb" }));
 app.use(express.urlencoded({ limit: "150mb", extended: true }));
@@ -112,8 +121,10 @@ app.use("/api",propertyRouter)
 app.use("/api",cityRouter)
 app.use("/api",reviewRouter)
 app.use("/api",reservRouter)
+app.use("/api",paypalRouter)
 app.use("/api",CommonQuestionsRouter)
 app.use("/api",dashboardRouter)
+app.use("/api", stripeRoutes);
 
 app.get('/', (_req, res) => {
   res.send('API is working 🎉');
