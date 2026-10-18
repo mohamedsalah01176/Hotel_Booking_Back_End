@@ -15,7 +15,12 @@ import stripeRoutes from "./route/stripe"
 import CommonQuestionsRouter from "./route/commonQuestions";
 import dashboardRouter from "./route/dashboard";
 import StripeController from "./controler/stripe";
+import notificationRouter from "./route/notification";
 
+
+import dns from "node:dns";
+
+dns.setServers(["8.8.8.8"]);
 
 const stripeController = new StripeController();
 
@@ -125,6 +130,7 @@ app.use("/api",paypalRouter)
 app.use("/api",CommonQuestionsRouter)
 app.use("/api",dashboardRouter)
 app.use("/api", stripeRoutes);
+app.use("/api", notificationRouter);
 
 app.get('/', (_req, res) => {
   res.send('API is working 🎉');
