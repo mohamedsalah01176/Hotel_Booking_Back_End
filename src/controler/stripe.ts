@@ -53,6 +53,24 @@ export default class StripeController {
         });
       }
 
+      const conflictingReservation = await ReserveDateModel.exists({
+        propertyId,
+        reserveDates: {
+          $elemMatch: {
+            startDate: { $lt: endDate },
+            endDate: { $gt: startDate },
+          },
+        },
+      });
+
+      if (conflictingReservation) {
+        return res.status(409).json({
+          status: "error",
+          messageEn: "This property is already booked for the selected dates",
+          messageAr: "هذا العقار محجوز بالفعل في التواريخ المحددة",
+        });
+      }
+
       const startDay = Date.UTC(
         startDate.getUTCFullYear(),
         startDate.getUTCMonth(),
@@ -171,7 +189,11 @@ export default class StripeController {
 
 
   async webhook(req: Request, res: Response) {
+      console.log("STRIPE WEBHOOK RECEIVED");
+
     const signature = req.headers["stripe-signature"];
+
+    console.log("STRIPE SIGNATURE EXISTS:", !!signature);
 
     if (typeof signature !== "string") {
       return res.status(400).send("Missing Stripe signature");
@@ -285,37 +307,57 @@ export default class StripeController {
           currency: pending.currency,
         };
 
-        const existing = await ReserveDateModel.findOne({
-          propertyId: pending.propertyId,
-        }).session(dbSession);
-
-        // Extra duplicate protection using the Stripe session ID.
-        const alreadyReserved = existing?.reserveDates.some(
-          (item: any) => item.paymentId === checkoutSession.id
+        // Atomically append only when no existing reservation intersects this
+        // interval. This is required even after the availability check above:
+        // another customer can complete checkout in the meantime.
+        const updated = await ReserveDateModel.updateOne(
+          {
+            propertyId: pending.propertyId,
+            reserveDates: {
+              $not: {
+                $elemMatch: {
+                  startDate: { $lt: pending.endDate },
+                  endDate: { $gt: pending.startDate },
+                },
+              },
+            },
+          },
+          { $push: { reserveDates: reservation } },
+          { session: dbSession }
         );
 
-        if (!alreadyReserved) {
+        if (updated.matchedCount === 0) {
+          const existing = await ReserveDateModel.findOne({
+            propertyId: pending.propertyId,
+          }).session(dbSession);
+
           if (existing) {
-            await ReserveDateModel.updateOne(
-              { _id: existing._id },
-              { $push: { reserveDates: reservation } },
-              { session: dbSession }
-            );
-          } else {
+            throw new Error("This property is already booked for the selected dates");
+          }
+
+          console.log("111111111")
+          try {
             await new ReserveDateModel({
               reserveDates: [reservation],
               adminId,
               propertyId: pending.propertyId.toString(),
               property: property.toObject(),
             }).save({ session: dbSession });
+          } catch (error: any) {
+            if (error?.code === 11000) {
+              throw new Error("This property is already booked for the selected dates");
+            }
+            throw error;
           }
-
-          await PropertyModel.updateOne(
-            { _id: property._id },
-            { $inc: { ordersNumbers: 1 } },
-            { session: dbSession }
-          );
         }
+
+        await PropertyModel.updateOne(
+          { _id: property._id },
+          { $inc: { ordersNumbers: 1 } },
+          { session: dbSession }
+        );
+
+        console.log("4444444")
 
         pending.status = "paid";
         await pending.save({ session: dbSession });
