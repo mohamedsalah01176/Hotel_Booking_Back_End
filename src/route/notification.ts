@@ -5,6 +5,13 @@ import notificationController from "../controler/notification";
 
 const router = Router();
 
+// Pusher private-channel authentication for the current user.
+router.post(
+  "/pusher/auth",
+  authentication,
+  notificationController.authorizePusherChannel
+);
+
 // Admin routes
 router.post(
   "/admin/notifications",

@@ -2,10 +2,41 @@
 import { Request, Response } from "express";
 import notificationService from "../service/notification";
 import { getUserId } from "../util/getUserId";
+import pusher from "../config/pusher";
 
 
 
 class NotificationController {
+  // POST: Authorize the current user for their own Pusher private channel
+  async authorizePusherChannel(req: Request, res: Response) {
+    try {
+      const { socket_id: socketId, channel_name: channelName } = req.body;
+
+      if (typeof socketId !== "string" || typeof channelName !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "socket_id and channel_name are required",
+        });
+      }
+
+      const expectedChannel = `private-user-${getUserId(req)}`;
+      if (channelName !== expectedChannel) {
+        return res.status(403).json({
+          success: false,
+          message: "You are not allowed to subscribe to this channel",
+        });
+      }
+
+      // Pusher's current server SDK exposes this as authorizeChannel.
+      return res.status(200).json(pusher.authorizeChannel(socketId, channelName));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+
+      return res.status(500).json({ success: false, message });
+    }
+  }
+
   // POST: Admin sends notification to users
   async send(req: Request, res: Response) {
     try {
