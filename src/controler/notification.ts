@@ -1,32 +1,23 @@
 
 import { Request, Response } from "express";
 import notificationService from "../service/notification";
+import { getUserId } from "../util/getUserId";
 
-const getUserId = (req: Request): string => {
-  const user = req.user;
 
-  if (!user || typeof user === "string") {
-    throw new Error("Authenticated user ID not found");
-  }
-
-  const userId = user._id;
-
-  if (!userId) {
-    throw new Error("Authenticated user ID not found");
-  }
-
-  return userId.toString();
-};
 
 class NotificationController {
   // POST: Admin sends notification to users
   async send(req: Request, res: Response) {
     try {
-      const { userIds, title, message, type } = req.body;
+      const { userId, title, message, type } = req.body;
 
+      console.log(!Array.isArray(userId));
+      console.log(userId);
+      console.log(typeof title !== "string");
+      console.log(typeof message !== "string")
+      console.log(req.body)
       if (
-        !Array.isArray(userIds) ||
-        !userIds.every((id) => typeof id === "string") ||
+        !userId ||
         typeof title !== "string" ||
         typeof message !== "string"
       ) {
@@ -37,7 +28,7 @@ class NotificationController {
       }
 
       const result = await notificationService.sendToUsers({
-        userIds,
+        userId,
         title,
         message,
         type,
