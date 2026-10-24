@@ -10,7 +10,7 @@ type NotificationType =
   | "promotion";
 
 interface SendNotificationData {
-  userIds: string[];
+  userId: string;
   title: string;
   message: string;
   type?: NotificationType;
@@ -19,33 +19,26 @@ interface SendNotificationData {
 class NotificationService {
   // Admin sends a notification to one or more users
   async sendToUsers(data: SendNotificationData) {
-    const { userIds, title, message, type = "general" } = data;
+    const { userId, title, message, type = "general" } = data;
 
-    if (!userIds.length) {
+    if (!userId) {
       throw new Error("At least one user is required");
     }
 
-    if (userIds.some((id) => !mongoose.isValidObjectId(id))) {
-      throw new Error("Invalid user ID");
-    }
 
     if (!title.trim() || !message.trim()) {
       throw new Error("Title and message are required");
     }
 
-    // Remove duplicate IDs
-    const uniqueUserIds = [...new Set(userIds)];
+    
 
     // Verify that all recipients exist
     const users = await UserModel.find({
-      _id: { $in: uniqueUserIds },
+      _id: { $in: userId },
     })
       .select("_id")
       .lean();
 
-    if (users.length !== uniqueUserIds.length) {
-      throw new Error("One or more users were not found");
-    }
 
     // Save a separate notification for every recipient
     const notifications = await Notification.insertMany(
