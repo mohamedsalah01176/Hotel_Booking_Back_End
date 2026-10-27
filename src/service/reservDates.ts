@@ -2,6 +2,7 @@ import { IUserPayload } from "../interface/user";
 import PropertyModel from "../model/property";
 import { ReserveDateModel } from "../model/ReservDates";
 import { sendEmailReservationCancelled, sendReservationEmailForUser } from "../util/sendEmail";
+import notificationService from "./notification";
 
 export default class ReservDatesService{
 
@@ -123,6 +124,44 @@ async handleRevesveDates(
       process.env.AUTHEMAIL!
     );
 
+    // Send in-app & Pusher notifications to client and host
+    try {
+      const hotelTitleEn = property.titleEn || property.title || "the property";
+      const hotelTitleAr = property.titleAr || property.title || "العقار";
+      const hostId = property.admin?._id?.toString();
+      const clientId = user._id?.toString();
+
+      // Notification for client
+      if (clientId) {
+        await notificationService.sendToUsers({
+          userId: clientId,
+          title: "Booking Confirmed",
+          titleEn: "Booking Confirmed",
+          titleAr: "تم تأكيد الحجز",
+          message: `Your booking for "${hotelTitleEn}" has been confirmed!`,
+          messageEn: `Your booking for "${hotelTitleEn}" has been confirmed!`,
+          messageAr: `تم تأكيد حجزك في "${hotelTitleAr}" بنجاح!`,
+          type: "booking",
+        });
+      }
+
+      // Notification for host
+      if (hostId && hostId !== clientId) {
+        await notificationService.sendToUsers({
+          userId: hostId,
+          title: "New Booking Received",
+          titleEn: "New Booking Received",
+          titleAr: "تم استلام حجز جديد",
+          message: `You have received a new booking for "${hotelTitleEn}".`,
+          messageEn: `You have received a new booking for "${hotelTitleEn}".`,
+          messageAr: `لقد استلمت حجزاً جديداً في "${hotelTitleAr}".`,
+          type: "booking",
+        });
+      }
+    } catch (notifErr) {
+      console.error("Failed to send booking notifications:", notifErr);
+    }
+
     return {
       status: "success",
       message: "Date reserved successfully",
@@ -205,17 +244,63 @@ async handleRevesveDates(
   async handleDeleteRevervedDate(dateId:string,user:IUserPayload){
     try{
       const hotel = await ReserveDateModel.findOne({ "reserveDates._id": dateId });
-      const property= await PropertyModel.findOne({_id:hotel?.propertyId})
       if (!hotel) {
-          console.error("Reservation not found");
-          return;
+        return {
+          status: "fail",
+          message: "Reservation not found",
+        };
       }
+      const property = await PropertyModel.findOne({ _id: hotel?.propertyId });
+
+      const reservedItem = hotel.reserveDates.find(
+        (r: any) => r._id?.toString() === dateId
+      );
+      const guestUserId = reservedItem?.userId?.toString() || user._id?.toString();
 
       const deletedHotel = await ReserveDateModel.updateOne({"reserveDates._id": dateId },{$pull:{reserveDates:{_id:dateId}}});
     if (deletedHotel.modifiedCount>0) {
-      sendEmailReservationCancelled(property?.titleEn!,user.email,dateId)
-      sendEmailReservationCancelled(property?.titleEn!,property?.admin.email!,dateId)
-      sendEmailReservationCancelled(property?.titleEn!,process.env.AUTHEMAIL!,dateId)
+      const emailTitle = property?.titleEn || property?.title || "Property";
+      if (user?.email) sendEmailReservationCancelled(emailTitle, user.email, dateId);
+      if (property?.admin?.email) sendEmailReservationCancelled(emailTitle, property.admin.email, dateId);
+      if (process.env.AUTHEMAIL) sendEmailReservationCancelled(emailTitle, process.env.AUTHEMAIL, dateId);
+
+      // Send in-app & Pusher notifications to client and host
+      try {
+        const hotelTitleEn = property?.titleEn || property?.title || "the property";
+        const hotelTitleAr = property?.titleAr || property?.title || "العقار";
+        const hostId = property?.admin?._id?.toString() || hotel.adminId?.toString();
+
+        // Notification for client
+        if (guestUserId) {
+          await notificationService.sendToUsers({
+            userId: guestUserId,
+            title: "Reservation Cancelled",
+            titleEn: "Reservation Cancelled",
+            titleAr: "تم إلغاء الحجز",
+            message: `The reservation for "${hotelTitleEn}" has been cancelled.`,
+            messageEn: `The reservation for "${hotelTitleEn}" has been cancelled.`,
+            messageAr: `تم إلغاء الحجز الخاص بك في "${hotelTitleAr}".`,
+            type: "booking",
+          });
+        }
+
+        // Notification for host
+        if (hostId && hostId !== guestUserId) {
+          await notificationService.sendToUsers({
+            userId: hostId,
+            title: "Reservation Cancelled",
+            titleEn: "Reservation Cancelled",
+            titleAr: "تم إلغاء الحجز",
+            message: `A reservation for "${hotelTitleEn}" has been cancelled.`,
+            messageEn: `A reservation for "${hotelTitleEn}" has been cancelled.`,
+            messageAr: `تم إلغاء حجز في "${hotelTitleAr}".`,
+            type: "booking",
+          });
+        }
+      } catch (notifErr) {
+        console.error("Failed to send cancellation notifications:", notifErr);
+      }
+
       return {
         status: "success",
         message :"Hotal Deleted"

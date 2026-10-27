@@ -12,6 +12,10 @@ const provincesMapEnToAr: Record<string, string> = {
   "Idlib": "إدلب",
   "Hama": "حماة",
   "Homs": "حمص",
+  "Giza": "الجيزة",
+  "giza": "الجيزة",
+  "Aj Jiza": "الجيزة",
+  "Al Jizah": "الجيزة",
 };
 
 export const translateToAr = async (body: IProperty): Promise<IProperty> => {

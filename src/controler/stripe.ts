@@ -8,11 +8,14 @@ import stripe from "../service/stripe";
 import UserModel from "../model/user";
 import { ReserveDateModel } from "../model/ReservDates";
 import { sendReservationEmailForUser } from "../util/sendEmail";
+import notificationService from "../service/notification";
 import type Stripe from "stripe";
 type ReservationEmailData = {
   title: string;
   userEmail: string;
   adminEmail?: string;
+  userId?: string;
+  adminId?: string;
 };
 
 
@@ -189,11 +192,9 @@ export default class StripeController {
 
 
   async webhook(req: Request, res: Response) {
-      console.log("STRIPE WEBHOOK RECEIVED");
 
     const signature = req.headers["stripe-signature"];
 
-    console.log("STRIPE SIGNATURE EXISTS:", !!signature);
 
     if (typeof signature !== "string") {
       return res.status(400).send("Missing Stripe signature");
@@ -335,7 +336,6 @@ export default class StripeController {
             throw new Error("This property is already booked for the selected dates");
           }
 
-          console.log("111111111")
           try {
             await new ReserveDateModel({
               reserveDates: [reservation],
@@ -357,15 +357,16 @@ export default class StripeController {
           { session: dbSession }
         );
 
-        console.log("4444444")
 
         pending.status = "paid";
         await pending.save({ session: dbSession });
 
         emailData.value = {
-          title: property.titleEn || "Hotel reservation",
+          title: property.titleEn || property.title || "Hotel reservation",
           userEmail: user.email,
           adminEmail: admin?.email,
+          userId: user._id?.toString(),
+          adminId: admin?._id?.toString(),
         };
       });
 
@@ -399,6 +400,29 @@ export default class StripeController {
           );
         } catch (error) {
           console.error("Reservation email sending failed:", error);
+        }
+
+        // Send in-app & Pusher notifications to client and host
+        try {
+          if (notification.userId) {
+            await notificationService.sendToUsers({
+              userId: notification.userId,
+              title: "Booking Confirmed",
+              message: `Your booking for "${notification.title}" has been confirmed!`,
+              type: "booking",
+            });
+          }
+
+          if (notification.adminId && notification.adminId !== notification.userId) {
+            await notificationService.sendToUsers({
+              userId: notification.adminId,
+              title: "New Booking Received",
+              message: `You have received a new booking for "${notification.title}".`,
+              type: "booking",
+            });
+          }
+        } catch (error) {
+          console.error("Reservation in-app notification failed:", error);
         }
       }
 

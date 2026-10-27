@@ -643,7 +643,7 @@ export async function sendEmailReservationCancelled(propertyName: string, userEm
         from: `"Support Team" <${process.env.AUTHEMAIL}>`,
         to: userEmail,
         subject: "Reservation Cancelled",
-        text: `Hello, your reservation for "${propertyName.split(" ").slice(0,3).join(" ")}" on ${reservationDate} has been cancelled successfully.`,
+        text: `Hello, your reservation for "${propertyName?.split(" ").slice(0,3).join(" ")}" on ${reservationDate} has been cancelled successfully.`,
         html: `
         <html>
         <head>
