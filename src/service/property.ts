@@ -7,6 +7,7 @@ import { translateToAr } from "../util/Property/translateToAr";
 import { translateToEn } from "../util/Property/translateToEn";
 import { sendEmailActivatedProperty, sendEmailCreatedProperty, sendEmailDeactivatedProperty, sendEmailManagerDeletedProperty } from "../util/sendEmail";
 import { propertySchema } from "../util/yapSchema";
+import notificationService from "./notification";
 
 export class PropertyService{
 
@@ -254,8 +255,30 @@ export class PropertyService{
         }
       }
       foundProperty.set({isConfirmed:true});
-      foundProperty.save()
-      sendEmailCreatedProperty(foundProperty?.title,foundProperty?.admin?.email)
+      await foundProperty.save();
+      sendEmailCreatedProperty(foundProperty?.title,foundProperty?.admin?.email);
+
+      // Send in-app notification to the host
+      const hostId = foundProperty?.admin?._id?.toString();
+      if (hostId) {
+        try {
+          const hotelNameEn = foundProperty.titleEn || foundProperty.title || "property";
+          const hotelNameAr = foundProperty.titleAr || foundProperty.title || "العقار";
+          await notificationService.sendToUsers({
+            userId: hostId,
+            title: "Hotel Published Successfully",
+            titleEn: "Hotel Published Successfully",
+            titleAr: "تم نشر الفندق بنجاح",
+            message: `Your hotel "${hotelNameEn}" has been approved and published.`,
+            messageEn: `Your hotel "${hotelNameEn}" has been approved and published.`,
+            messageAr: `تمت الموافقة على فندقك "${hotelNameAr}" ونشره بنجاح.`,
+            type: "general",
+          });
+        } catch (notifErr) {
+          console.error("Failed to send publication notification to host:", notifErr);
+        }
+      }
+
       return{
         status:"success",
         message:"Property is confirmed"
@@ -277,7 +300,26 @@ export class PropertyService{
         message: "This property was not found"
       };
     }
-    await CityModel.updateOne({nameEn:deletedProperty.location.cityEn},{$inc:{numberOfHotel:-1}})
+    const cityEn = deletedProperty.location?.cityEn?.toLowerCase();
+    if (cityEn) {
+      await CityModel.updateOne(
+        {
+          $or: [
+            { nameEn: { $regex: new RegExp(`^${cityEn}$`, "i") } },
+            { name: { $regex: new RegExp(`^${cityEn}$`, "i") } },
+          ],
+        },
+        { $inc: { numberOfHotel: -1 } }
+      );
+      // Remove city if no hotels are left
+      await CityModel.deleteMany({
+        $or: [
+          { nameEn: { $regex: new RegExp(`^${cityEn}$`, "i") } },
+          { name: { $regex: new RegExp(`^${cityEn}$`, "i") } },
+        ],
+        numberOfHotel: { $lte: 0 },
+      });
+    }
     sendEmailManagerDeletedProperty(deletedProperty.titleEn!,deletedProperty.admin.email!)
     return {
       status: "success",

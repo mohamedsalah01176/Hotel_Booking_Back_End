@@ -13,9 +13,25 @@ const notificationSchema = new Schema(
       required: true,
       trim: true,
     },
+    titleEn: {
+      type: String,
+      trim: true,
+    },
+    titleAr: {
+      type: String,
+      trim: true,
+    },
     message: {
       type: String,
       required: true,
+      trim: true,
+    },
+    messageEn: {
+      type: String,
+      trim: true,
+    },
+    messageAr: {
+      type: String,
       trim: true,
     },
     type: {

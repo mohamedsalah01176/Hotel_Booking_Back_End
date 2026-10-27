@@ -48,6 +48,10 @@ async function getAccessToken(): Promise<string> {
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_SECRET_KEY;
 
+
+  console.log("PayPal Client ID exists:", !!process.env.PAYPAL_CLIENT_ID);
+console.log("PayPal Secret exists:", !!process.env.PAYPAL_SECRET_KEY);
+console.log("PayPal Base URL:", process.env.PAYPAL_BASE_URL);
   if (!clientId || !clientSecret) {
     throw new Error("PayPal credentials are missing");
   }
@@ -84,6 +88,7 @@ export async function createPayPalOrder(amount: number) {
 
   try {
     const accessToken = await getAccessToken();
+    console.log("accessToken",accessToken)
 
     const response = await fetch(
       `${PAYPAL_BASE_URL}/v2/checkout/orders`,

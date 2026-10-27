@@ -41,12 +41,6 @@ class NotificationController {
   async send(req: Request, res: Response) {
     try {
       const { userId, title, message, type } = req.body;
-
-      console.log(!Array.isArray(userId));
-      console.log(userId);
-      console.log(typeof title !== "string");
-      console.log(typeof message !== "string")
-      console.log(req.body)
       if (
         !userId ||
         typeof title !== "string" ||
@@ -98,11 +92,13 @@ class NotificationController {
       const userId = getUserId(req);
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 20;
+      const lang = typeof req.query.lang === "string" ? req.query.lang : undefined;
 
       const result = await notificationService.getUserNotifications(
         userId,
         page,
-        limit
+        limit,
+        lang
       );
 
       return res.status(200).json({

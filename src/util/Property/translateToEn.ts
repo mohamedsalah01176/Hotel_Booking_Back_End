@@ -10,7 +10,9 @@ const provincesMapArToEn: Record<string, string> = {
   "طرطوس": "Tartus",
   "إدلب": "Idlib",
   "حماة": "Hama",
-  "حمص": "Homs"
+  "حمص": "Homs",
+  "الجيزة": "Giza",
+  "جيزة": "Giza"
 };
 
 export const translateToEn = async (body: IProperty): Promise<IProperty> => {
