@@ -8,6 +8,7 @@ import {
 } from "../service/paypal";
 import { IUserPayload } from "../interface/user";
 import pendingBooking from "../model/pendingBooking";
+import { ReserveDateModel } from "../model/ReservDates";
 
 export default class PayPalController {
   async createOrder(req: Request, res: Response) {
@@ -167,47 +168,166 @@ export default class PayPalController {
 
     const order = await getPayPalOrder(orderId);
 
-console.log("Order status:", order.status);
-console.log("Order intent:", order.intent);
+  let payment;
 
-    const payment = await capturePayPalOrder(orderId);
-
-    if (payment.status !== "COMPLETED") {
-      return res.status(400).json({
-        status: "error",
-        message: "PayPal payment is not completed",
-      });
-    }
-
-    const capture = payment.purchase_units?.[0]
-      ?.payments?.captures?.[0];
-
-    if (
-      capture?.status !== "COMPLETED" ||
-      capture?.amount?.currency_code !== pending.currency ||
-      Number(capture?.amount?.value) !== pending.amount
-    ) {
-      return res.status(400).json({
-        status: "error",
-        message: "Payment amount or status is invalid",
-      });
-    }
-
-    // IMPORTANT:
-    // In production, perform the following steps atomically:
-    // 1. Revalidate and own the date locks.
-    // 2. Mark this payment as processing using a conditional update.
-    // 3. Create the reservation exactly once.
-    // 4. Mark payment as paid and save capture.id.
-    //
-    // Use a MongoDB transaction and an idempotency strategy.
-    // Do not simply append the booking and then update status
-    // without handling concurrent capture requests.
-
-    return res.status(501).json({
+  if (order.status === "COMPLETED") {
+    // Payment was already captured successfully.
+    payment = order;
+  } else if (order.status === "APPROVED") {
+    payment = await capturePayPalOrder(orderId);
+  } else {
+    return res.status(400).json({
       status: "error",
-      message: "Atomic reservation persistence is not implemented",
+      message: "PayPal order is not approved",
     });
+  }
+
+  if (payment.status !== "COMPLETED") {
+    return res.status(400).json({
+      status: "error",
+      message: "PayPal payment is not completed",
+    });
+  }
+
+  const capture = payment.purchase_units?.[0]
+    ?.payments?.captures?.[0];
+
+  if (
+    capture?.status !== "COMPLETED" ||
+    capture?.amount?.currency_code !== pending.currency ||
+    Math.round(Number(capture?.amount?.value) * 100) !==
+      Math.round(pending.amount * 100) ||
+    !capture?.id
+  ) {
+    return res.status(400).json({
+      status: "error",
+      message: "Payment amount or status is invalid",
+    });
+  }
+
+  // Save reservation and update pending booking atomically.
+  const session = await mongoose.startSession();
+
+  let reservation: any;
+
+  try {
+    await session.withTransaction(async () => {
+
+      // 1. Claim the pending booking.
+      const claimed = await pendingBooking.findOneAndUpdate(
+        {
+          _id: pending._id,
+          userId: user._id,
+          status: "pending",
+          expiresAt: { $gt: new Date() },
+        },
+        {
+          $set: {
+            status: "paid",
+          },
+        },
+        {
+          new: true,
+          session,
+        }
+      );
+
+      if (!claimed) {
+        throw new Error("BOOKING_ALREADY_PROCESSED_OR_EXPIRED");
+      }
+
+      // 2. Get property information.
+      const property = await PropertyModel.findById(
+        claimed.propertyId
+      ).session(session);
+
+      if (!property || !property.admin?._id) {
+        throw new Error("PROPERTY_OR_ADMIN_NOT_FOUND");
+      }
+
+      // 3. Prevent overlapping reservations.
+      const reservationFilter = {
+        propertyId: claimed.propertyId,
+        reserveDates: {
+          $not: {
+            $elemMatch: {
+              startDate: { $lt: claimed.endDate },
+              endDate: { $gt: claimed.startDate },
+            },
+          },
+        },
+      };
+
+      // 4. Create reservation or append to existing property document.
+      reservation = await ReserveDateModel.findOneAndUpdate(
+        reservationFilter,
+        {
+          $setOnInsert: {
+            adminId: property.admin._id,
+            property: property.toObject(),
+          },
+          $set: {
+            paymentMethod: "paypal",
+            paymentStatus: "paid",
+          },
+          $push: {
+            reserveDates: {
+              startDate: claimed.startDate,
+              endDate: claimed.endDate,
+              userId: claimed.userId,
+              paymentMethod: "paypal",
+              paymentStatus: "paid",
+              paymentId: capture.id,
+              amount: claimed.amount,
+              currency: claimed.currency,
+            },
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+          runValidators: true,
+          session,
+        }
+      );
+
+      if (!reservation) {
+        throw new Error("RESERVATION_CREATION_FAILED");
+      }
+
+      // 5. Increment property orders count.
+      await PropertyModel.updateOne(
+        { _id: claimed.propertyId },
+        { $inc: { ordersNumbers: 1 } },
+        { session }
+      );
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Payment completed and reservation created successfully",
+      data: {
+        orderId,
+        captureId: capture.id,
+        reservationId: reservation?._id,
+        paymentStatus: "paid",
+      },
+    });
+
+  } catch (error) {
+    console.error("Reservation transaction failed:", error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Payment was captured but reservation persistence failed. Please contact support.",
+      orderId,
+      captureId: capture.id,
+    });
+
+  } finally {
+    await session.endSession();
+  }
+      
   } catch (error) {
     console.error("PayPal capture failed:", error);
 

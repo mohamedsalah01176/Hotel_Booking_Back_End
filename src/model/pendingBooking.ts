@@ -39,7 +39,7 @@ const pendingBookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "paid", "failed", "expired"],
+      enum: ["pending","processing", "paid", "failed", "expired"],
       default: "pending",
     },
     expiresAt: {
